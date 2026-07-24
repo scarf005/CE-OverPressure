@@ -13,17 +13,13 @@ type CEOverPressureSettings() =
         with get () = enableLogging
         and set v = enableLogging <- v
 
-    override this.ExposeData() =
-        Scribe_Values.Look<bool>(&enableLogging, "enableLogging", false, false)
+    override this.ExposeData() = Scribe_Values.Look<bool>(&enableLogging, "enableLogging", false, false)
 
 
 type CEOverPressureMod(contents: ModContentPack) as this =
     inherit Mod(contents)
 
-    do
-        LongEventHandler.ExecuteWhenFinished(fun () ->
-            this.GetSettings<CEOverPressureSettings>() |> ignore
-        )
+    do LongEventHandler.ExecuteWhenFinished(fun () -> this.GetSettings<CEOverPressureSettings>() |> ignore)
 
     override this.SettingsCategory() = "CE-OverPressure"
 

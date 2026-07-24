@@ -55,6 +55,23 @@ module internal Overpressure =
             let stunTicks = Mathf.RoundToInt(Mathf.Clamp(peakKPa, configuration.minimumStunTicks, configuration.maximumStunTicks))
             pawn.stances.stunner.StunFor(stunTicks, instigator)
 
+    let private blastWeight (part: BodyPartRecord) =
+        let tags = part.def.tags
+
+        if tags.Contains BodyPartTagDefOf.BreathingSource then 4.0f
+        elif tags.Contains BodyPartTagDefOf.HearingSource then 3.0f
+        elif tags.Contains BodyPartTagDefOf.EatingSource then 2.5f
+        elif tags.Contains BodyPartTagDefOf.ConsciousnessSource then 2.0f
+        elif tags.Contains BodyPartTagDefOf.BloodPumpingSource then 1.5f
+        elif
+            tags.Contains BodyPartTagDefOf.BloodFiltrationLiver
+            || tags.Contains BodyPartTagDefOf.BloodFiltrationKidney
+            || tags.Contains BodyPartTagDefOf.BloodFiltrationSource
+        then
+            1.0f
+        elif tags.Contains BodyPartTagDefOf.MetabolismSource then 1.0f
+        else 2.0f
+
     let private partsToDamage (configuration: OverpressureSettingsDef) peakKPa partCount =
         let mutable bestThreshold = Single.MinValue
         let mutable result = 0
@@ -77,12 +94,18 @@ module internal Overpressure =
                 Log.Message(sprintf "[CE-OverPressure] stunned %O at %.1f kPa" pawn peakKPa)
                 stun configuration pawn peakKPa instigator
             else
-                let internalParts = SimplePool<List<BodyPartRecord>>.Get()
+                let weightedParts = SimplePool<List<BodyPartRecord>>.Get()
 
                 try
+                    let mutable uniqueCount = 0
+
                     for part in pawn.health.hediffSet.GetNotMissingParts() do
                         if part.depth = BodyPartDepth.Inside then
-                            internalParts.Add part
+                            uniqueCount <- uniqueCount + 1
+                            let w = Mathf.RoundToInt(blastWeight part)
+
+                            for _ = 1 to w do
+                                weightedParts.Add part
 
                     let damagePerPart =
                         Mathf.Clamp(
@@ -91,7 +114,7 @@ module internal Overpressure =
                             configuration.maximumDamagePerPart
                         )
 
-                    let count = partsToDamage configuration peakKPa internalParts.Count
+                    let count = partsToDamage configuration peakKPa uniqueCount
 
                     log (
                         sprintf
@@ -99,7 +122,7 @@ module internal Overpressure =
                             pawn
                             peakKPa
                             count
-                            internalParts.Count
+                            uniqueCount
                             damagePerPart
                             armorPenetration
                     )
@@ -107,10 +130,10 @@ module internal Overpressure =
                     let mutable index = 0
 
                     while index < count && not pawn.Dead do
-                        let selectedIndex = Rand.Range(index, internalParts.Count)
-                        let part = internalParts[selectedIndex]
-                        internalParts[selectedIndex] <- internalParts[index]
-                        internalParts[index] <- part
+                        let selectedIndex = Rand.Range(index, weightedParts.Count)
+                        let part = weightedParts[selectedIndex]
+                        weightedParts[selectedIndex] <- weightedParts[index]
+                        weightedParts[index] <- part
 
                         DamageInfo(configuration.injuryDamageDef, damagePerPart, armorPenetration, -1.0f, instigator, part) |> pawn.TakeDamage |> ignore
 
@@ -118,8 +141,8 @@ module internal Overpressure =
 
                     stun configuration pawn peakKPa instigator
                 finally
-                    internalParts.Clear()
-                    SimplePool<List<BodyPartRecord>>.Return internalParts
+                    weightedParts.Clear()
+                    SimplePool<List<BodyPartRecord>>.Return weightedParts
 
     let private applyToPawn
         (configuration: OverpressureSettingsDef)
