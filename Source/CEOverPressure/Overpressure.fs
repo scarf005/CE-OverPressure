@@ -57,31 +57,19 @@ module internal Overpressure =
 
     let private blastWeightMap =
         lazy
-            let dict = Dictionary<BodyPartTagDef, float32>()
-
-            dict.Add(BodyPartTagDefOf.BreathingSource, 4.0f)
-            dict.Add(BodyPartTagDefOf.HearingSource, 3.0f)
-            dict.Add(BodyPartTagDefOf.EatingSource, 2.5f)
-            dict.Add(BodyPartTagDefOf.ConsciousnessSource, 2.0f)
-            dict.Add(BodyPartTagDefOf.BloodPumpingSource, 1.5f)
-            dict.Add(BodyPartTagDefOf.BloodFiltrationLiver, 1.0f)
-            dict.Add(BodyPartTagDefOf.BloodFiltrationKidney, 1.0f)
-            dict.Add(BodyPartTagDefOf.BloodFiltrationSource, 1.0f)
-            dict.Add(BodyPartTagDefOf.MetabolismSource, 1.0f)
-
-            dict
+            (dict
+                [ BodyPartTagDefOf.BreathingSource, 4.0f
+                  BodyPartTagDefOf.HearingSource, 3.0f
+                  BodyPartTagDefOf.EatingSource, 2.5f ])
 
     let private blastWeight (part: BodyPartRecord) =
         let dict = blastWeightMap.Value
-        let mutable bestWeight = 2.0f
 
-        for tag in part.def.tags do
+        part.def.tags
+        |> Seq.choose (fun tag ->
             let mutable w = 0.0f
-
-            if dict.TryGetValue(tag, &w) && w > bestWeight then
-                bestWeight <- w
-
-        bestWeight
+            if dict.TryGetValue(tag, &w) then Some w else None)
+        |> fun found -> if Seq.isEmpty found then 2.0f else Seq.max found
 
     let private partsToDamage (configuration: OverpressureSettingsDef) peakKPa partCount =
         let mutable bestThreshold = Single.MinValue
