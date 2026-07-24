@@ -100,7 +100,10 @@ type OverpressureSettingsDef() =
     val mutable groundReflectionMultiplier: float32
 
     [<Microsoft.FSharp.Core.DefaultValue>]
-    val mutable enclosedReflectionMultiplier: float32
+    val mutable maximumEnclosedReflectionMultiplier: float32
+
+    [<Microsoft.FSharp.Core.DefaultValue>]
+    val mutable enclosedReferenceRoomCellCount: float32
 
     [<Microsoft.FSharp.Core.DefaultValue>]
     val mutable thermobaricPressureMultiplier: float32

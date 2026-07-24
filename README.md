@@ -5,8 +5,8 @@ Adds blast overpressure injuries to [Combat Extended](https://github.com/CombatE
 ## Behavior
 
 - estimates TNT yield from CE explosion damage and radius
-- blocks pressure through solid walls
-- increases ground-level and enclosed-space pressure
+- traverses nearby RimWorld regions and blocks pressure at closed doors and solid walls
+- scales enclosed-space pressure by native room size and roof coverage
 - stuns pawns at low pressure and damages randomly selected internal organs at higher pressure
 - detects conventional and thermobaric blasts from `DamageDef` behavior
 - ignores non-explosive incendiary effects

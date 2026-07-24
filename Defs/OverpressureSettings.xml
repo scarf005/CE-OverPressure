@@ -24,7 +24,8 @@
     <minimumDistanceCells>0.5</minimumDistanceCells>
     <groundReflectionMaximumHeight>1.5</groundReflectionMaximumHeight>
     <groundReflectionMultiplier>1.35</groundReflectionMultiplier>
-    <enclosedReflectionMultiplier>1.35</enclosedReflectionMultiplier>
+    <maximumEnclosedReflectionMultiplier>1.35</maximumEnclosedReflectionMultiplier>
+    <enclosedReferenceRoomCellCount>25</enclosedReferenceRoomCellCount>
     <thermobaricPressureMultiplier>1.45</thermobaricPressureMultiplier>
     <stunThresholdKPa>25</stunThresholdKPa>
     <injuryThresholdKPa>35</injuryThresholdKPa>
