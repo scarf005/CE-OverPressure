@@ -68,6 +68,7 @@ module internal Overpressure =
     let private applyInjuries (configuration: OverpressureSettingsDef) (pawn: Pawn) peakKPa (instigator: Thing) =
         if peakKPa >= configuration.stunThresholdKPa then
             if peakKPa < configuration.injuryThresholdKPa then
+                Log.Message(sprintf "[CE-OverPressure] stunned %O at %.1f kPa" pawn peakKPa)
                 stun configuration pawn peakKPa instigator
             else
                 let internalParts = SimplePool<List<BodyPartRecord>>.Get()
@@ -85,6 +86,11 @@ module internal Overpressure =
                         )
 
                     let count = partsToDamage configuration peakKPa internalParts.Count
+
+                    Log.Message(
+                        sprintf "[CE-OverPressure] injured %O at %.1f kPa, %d/%d parts, %.1f dmg/part" pawn peakKPa count internalParts.Count damagePerPart
+                    )
+
                     let mutable index = 0
 
                     while index < count && not pawn.Dead do
@@ -155,6 +161,18 @@ module internal Overpressure =
                         let scanRadius = max (radius + configuration.scanRadiusPadding) (PressureModel.pressureRangeCells parameters yieldKg)
                         let blastRoom = RegionAndRoomQuery.RoomAt(center, map, RegionType.Set_Passable)
                         let enclosedMultiplier = roomMultiplier configuration blastRoom
+
+                        Log.Message(
+                            sprintf
+                                "[CE-OverPressure] %O caused %.1fkg TNT blast at %O, pressureMult=%.2f, enclosedMult=%.2f, scanRadius=%.1f"
+                                instigator
+                                yieldKg
+                                center
+                                pressureMultiplier
+                                enclosedMultiplier
+                                scanRadius
+                        )
+
                         let maximumRegions = Mathf.CeilToInt(Mathf.PI * scanRadius * scanRadius) + 1
 
                         let processedPawns = SimplePool<HashSet<Pawn>>.Get()
