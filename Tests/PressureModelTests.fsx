@@ -15,9 +15,10 @@ let private readFloat name =
 
 let private parameters =
     { MetresPerCell = readFloat "metresPerCell"
-      ReferenceDamage = readFloat "referenceDamage"
-      ReferenceYieldKg = readFloat "referenceYieldKg"
+      DamagePerKgTnt = readFloat "damagePerKgTnt"
+      RadiusMetresPerKgTnt = readFloat "radiusMetresPerKgTnt"
       YieldExponent = readFloat "yieldExponent"
+      DamageYieldWeight = readFloat "damageYieldWeight"
       MinimumYieldKg = readFloat "minimumYieldKg"
       MaximumYieldKg = readFloat "maximumYieldKg"
       MinimumPressureYieldKg = readFloat "minimumPressureYieldKg"
@@ -36,6 +37,7 @@ let assertNear expected actual tolerance message =
     if abs (expected - actual) > tolerance then
         failwithf "%s: expected %f, got %f" message expected actual
 
-assertNear 2.2f (PressureModel.estimateYieldKg parameters 217) 0.0001f "105 mm reference yield"
-assertNear 0.0f (PressureModel.estimateYieldKg parameters 0) 0.0f "zero damage yield"
-assertNear 65.2937f (PressureModel.peakPressureKPa parameters 4.0f 2.2f) 0.01f "105 mm pressure at four metres"
+assertNear 1.0f (PressureModel.estimateYieldKg parameters 100 2.5f) 0.0001f "one-kilogram reference yield"
+assertNear 1.8661f (PressureModel.estimateYieldKg parameters 100 5.0f) 0.001f "radius contribution"
+assertNear 0.0f (PressureModel.estimateYieldKg parameters 0 2.5f) 0.0f "zero damage yield"
+assertNear 65.2937f (PressureModel.peakPressureKPa parameters 4.0f 2.2f) 0.01f "pressure at four metres"

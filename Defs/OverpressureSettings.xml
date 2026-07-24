@@ -3,9 +3,10 @@
   <CEOverPressure.OverpressureSettingsDef>
     <defName>CEOP_DefaultSettings</defName>
     <metresPerCell>0.8</metresPerCell>
-    <referenceDamage>217</referenceDamage>
-    <referenceYieldKg>2.2</referenceYieldKg>
+    <damagePerKgTnt>100</damagePerKgTnt>
+    <radiusMetresPerKgTnt>2</radiusMetresPerKgTnt>
     <yieldExponent>1.35</yieldExponent>
+    <damageYieldWeight>0.7</damageYieldWeight>
     <minimumYieldKg>0.02</minimumYieldKg>
     <maximumYieldKg>1000</maximumYieldKg>
     <minimumPressureYieldKg>0.001</minimumPressureYieldKg>
@@ -24,6 +25,7 @@
     <groundReflectionMaximumHeight>1.5</groundReflectionMaximumHeight>
     <groundReflectionMultiplier>1.35</groundReflectionMultiplier>
     <enclosedReflectionMultiplier>1.35</enclosedReflectionMultiplier>
+    <thermobaricPressureMultiplier>1.45</thermobaricPressureMultiplier>
     <stunThresholdKPa>25</stunThresholdKPa>
     <injuryThresholdKPa>35</injuryThresholdKPa>
     <minimumStunTicks>30</minimumStunTicks>
@@ -34,42 +36,6 @@
     <maximumDamagePerPart>30</maximumDamagePerPart>
     <armorPenetration>999</armorPenetration>
     <injuryDamageDef>Blunt</injuryDamageDef>
-    <excludedDamageDefs>
-      <li>Smoke</li>
-      <li>EMP</li>
-      <li>Extinguish</li>
-      <li>Stun</li>
-      <li>Flame</li>
-      <li>PrometheumFlame</li>
-      <li>Flame_Secondary</li>
-      <li>Flame_Secondary_Incendiary</li>
-    </excludedDamageDefs>
-    <bodyPartPriorities>
-      <li>
-        <tag>BreathingSource</tag>
-        <priority>100</priority>
-      </li>
-      <li>
-        <tag>BloodFiltrationKidney</tag>
-        <priority>80</priority>
-      </li>
-      <li>
-        <tag>BloodFiltrationLiver</tag>
-        <priority>80</priority>
-      </li>
-      <li>
-        <tag>MetabolismSource</tag>
-        <priority>80</priority>
-      </li>
-      <li>
-        <tag>BloodPumpingSource</tag>
-        <priority>60</priority>
-      </li>
-      <li>
-        <tag>ConsciousnessSource</tag>
-        <priority>40</priority>
-      </li>
-    </bodyPartPriorities>
     <injuryBands>
       <li>
         <minimumPressureKPa>35</minimumPressureKPa>

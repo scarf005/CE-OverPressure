@@ -5,9 +5,10 @@ open System
 [<Struct>]
 type internal PressureModelParameters =
     { MetresPerCell: float32
-      ReferenceDamage: float32
-      ReferenceYieldKg: float32
+      DamagePerKgTnt: float32
+      RadiusMetresPerKgTnt: float32
       YieldExponent: float32
+      DamageYieldWeight: float32
       MinimumYieldKg: float32
       MaximumYieldKg: float32
       MinimumPressureYieldKg: float32
@@ -26,13 +27,16 @@ module internal PressureModel =
     let private power value exponent = Math.Pow(float value, float exponent) |> float32
     let private cubeRoot value = power value (1.0f / 3.0f)
 
-    let estimateYieldKg parameters damage =
-        if damage <= 0 then
+    let estimateYieldKg parameters damage radiusCells =
+        if damage <= 0 || radiusCells <= 0.0f then
             0.0f
         else
-            let ratio = float32 damage / parameters.ReferenceDamage
+            let damageYield = power (float32 damage / parameters.DamagePerKgTnt) parameters.YieldExponent
+            let radiusMetres = radiusCells * parameters.MetresPerCell
+            let radiusYield = power (radiusMetres / parameters.RadiusMetresPerKgTnt) 3.0f
+            let damageWeight = parameters.DamageYieldWeight |> max 0.0f |> min 1.0f
 
-            parameters.ReferenceYieldKg * power ratio parameters.YieldExponent |> max parameters.MinimumYieldKg |> min parameters.MaximumYieldKg
+            power damageYield damageWeight * power radiusYield (1.0f - damageWeight) |> max parameters.MinimumYieldKg |> min parameters.MaximumYieldKg
 
     let pressureRangeCells parameters yieldKg = parameters.RangeCoefficientMetres * cubeRoot yieldKg / parameters.MetresPerCell
 

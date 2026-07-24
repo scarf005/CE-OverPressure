@@ -4,18 +4,16 @@ Adds blast overpressure injuries to [Combat Extended](https://github.com/CombatE
 
 ## Behavior
 
-- estimates TNT yield from CE explosion damage
-- calibrates 105 mm HE shells to 2.2 kg TNT
+- estimates TNT yield from CE explosion damage and radius
 - blocks pressure through solid walls
 - increases ground-level and enclosed-space pressure
-- stuns pawns at low pressure and damages internal organs at higher pressure
-- excludes configured non-blast damage types
+- stuns pawns at low pressure and damages randomly selected internal organs at higher pressure
+- detects conventional and thermobaric blasts from `DamageDef` behavior
+- ignores non-explosive incendiary effects
 
 ## Configuration
 
-`Defs/OverpressureSettings.xml` controls the pressure model, reflection, injury thresholds, damage types, body-part tag priorities, and injury bands
-
-`Patches/CombatExtended.xml` supplies the explicit yield for CE's zero-damage 105 mm airburst shell while ordinary HE shells use damage-based estimation
+`Defs/OverpressureSettings.xml` controls yield weighting, the pressure model, reflection, thermobaric pressure, injury thresholds, and injury bands
 
 ## Projectile overrides
 

@@ -22,14 +22,6 @@ type OverpressureExtension() as this =
         this.pressureMultiplier <- 1.0f
 
 [<AllowNullLiteral>]
-type BodyPartPriority() =
-    [<Microsoft.FSharp.Core.DefaultValue>]
-    val mutable tag: BodyPartTagDef
-
-    [<Microsoft.FSharp.Core.DefaultValue>]
-    val mutable priority: int
-
-[<AllowNullLiteral>]
 type InjuryBand() =
     [<Microsoft.FSharp.Core.DefaultValue>]
     val mutable minimumPressureKPa: float32
@@ -45,13 +37,16 @@ type OverpressureSettingsDef() =
     val mutable metresPerCell: float32
 
     [<Microsoft.FSharp.Core.DefaultValue>]
-    val mutable referenceDamage: float32
+    val mutable damagePerKgTnt: float32
 
     [<Microsoft.FSharp.Core.DefaultValue>]
-    val mutable referenceYieldKg: float32
+    val mutable radiusMetresPerKgTnt: float32
 
     [<Microsoft.FSharp.Core.DefaultValue>]
     val mutable yieldExponent: float32
+
+    [<Microsoft.FSharp.Core.DefaultValue>]
+    val mutable damageYieldWeight: float32
 
     [<Microsoft.FSharp.Core.DefaultValue>]
     val mutable minimumYieldKg: float32
@@ -108,6 +103,9 @@ type OverpressureSettingsDef() =
     val mutable enclosedReflectionMultiplier: float32
 
     [<Microsoft.FSharp.Core.DefaultValue>]
+    val mutable thermobaricPressureMultiplier: float32
+
+    [<Microsoft.FSharp.Core.DefaultValue>]
     val mutable stunThresholdKPa: float32
 
     [<Microsoft.FSharp.Core.DefaultValue>]
@@ -138,19 +136,14 @@ type OverpressureSettingsDef() =
     val mutable injuryDamageDef: DamageDef
 
     [<Microsoft.FSharp.Core.DefaultValue>]
-    val mutable excludedDamageDefs: List<DamageDef>
-
-    [<Microsoft.FSharp.Core.DefaultValue>]
-    val mutable bodyPartPriorities: List<BodyPartPriority>
-
-    [<Microsoft.FSharp.Core.DefaultValue>]
     val mutable injuryBands: List<InjuryBand>
 
     member internal this.ModelParameters =
         { MetresPerCell = this.metresPerCell
-          ReferenceDamage = this.referenceDamage
-          ReferenceYieldKg = this.referenceYieldKg
+          DamagePerKgTnt = this.damagePerKgTnt
+          RadiusMetresPerKgTnt = this.radiusMetresPerKgTnt
           YieldExponent = this.yieldExponent
+          DamageYieldWeight = this.damageYieldWeight
           MinimumYieldKg = this.minimumYieldKg
           MaximumYieldKg = this.maximumYieldKg
           MinimumPressureYieldKg = this.minimumPressureYieldKg

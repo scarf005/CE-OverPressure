@@ -17,17 +17,13 @@ module internal Overpressure =
             | null -> None
             | extension -> Some extension
 
-    let private estimateYieldKg parameters damage (extension: OverpressureExtension option) =
+    let private estimateYieldKg parameters damage radius (extension: OverpressureExtension option) =
         match extension with
         | Some value when value.tntEquivalentKg > 0.0f -> value.tntEquivalentKg
-        | _ -> PressureModel.estimateYieldKg parameters damage
+        | _ -> PressureModel.estimateYieldKg parameters damage radius
 
-    let private blastPriority (configuration: OverpressureSettingsDef) (part: BodyPartRecord) =
-        configuration.bodyPartPriorities
-        |> Seq.filter (fun rule -> not (isNull rule) && not (isNull rule.tag) && part.def.tags.Contains rule.tag)
-        |> Seq.map (fun rule -> rule.priority)
-        |> Seq.append (Seq.singleton 0)
-        |> Seq.max
+    let private isThermobaric (damageDef: DamageDef) =
+        damageDef.isExplosive && not (isNull damageDef.workerClass) && typeof<DamageWorker_Flame>.IsAssignableFrom damageDef.workerClass
 
     let private stun (configuration: OverpressureSettingsDef) (pawn: Pawn) peakKPa (instigator: Thing) =
         if not pawn.Dead && not (isNull pawn.stances) && not (isNull pawn.stances.stunner) then
@@ -50,7 +46,8 @@ module internal Overpressure =
                 let internalParts =
                     pawn.health.hediffSet.GetNotMissingParts()
                     |> Seq.filter (fun part -> part.depth = BodyPartDepth.Inside)
-                    |> Seq.sortByDescending (blastPriority configuration)
+                    |> Seq.toArray
+                    |> fun parts -> parts.InRandomOrder()
                     |> Seq.toArray
 
                 let damagePerPart =
@@ -77,17 +74,18 @@ module internal Overpressure =
 
             if not (extension |> Option.exists (fun value -> value.disable)) then
                 let hasExplicitYield = extension |> Option.exists (fun value -> value.tntEquivalentKg > 0.0f)
-                let excluded = damage <= 0 || configuration.excludedDamageDefs.Contains damageDef
 
-                if hasExplicitYield || not excluded then
+                if hasExplicitYield || (damage > 0 && damageDef.isExplosive) then
                     let parameters = configuration.ModelParameters
-                    let yieldKg = estimateYieldKg parameters damage extension
+                    let yieldKg = estimateYieldKg parameters damage radius extension
 
                     if yieldKg > 0.0f then
-                        let pressureMultiplier =
+                        let extensionMultiplier =
                             match extension with
                             | Some value when value.pressureMultiplier > 0.0f -> value.pressureMultiplier
                             | _ -> 1.0f
+
+                        let pressureMultiplier = extensionMultiplier * (if isThermobaric damageDef then configuration.thermobaricPressureMultiplier else 1.0f)
 
                         let scanRadius = max (radius + configuration.scanRadiusPadding) (PressureModel.pressureRangeCells parameters yieldKg)
 
