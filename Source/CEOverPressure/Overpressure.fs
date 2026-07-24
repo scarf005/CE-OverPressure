@@ -55,22 +55,33 @@ module internal Overpressure =
             let stunTicks = Mathf.RoundToInt(Mathf.Clamp(peakKPa, configuration.minimumStunTicks, configuration.maximumStunTicks))
             pawn.stances.stunner.StunFor(stunTicks, instigator)
 
-    let private blastWeight (part: BodyPartRecord) =
-        let tags = part.def.tags
+    let private blastWeightMap =
+        lazy
+            let dict = Dictionary<BodyPartTagDef, float32>()
 
-        if tags.Contains BodyPartTagDefOf.BreathingSource then 4.0f
-        elif tags.Contains BodyPartTagDefOf.HearingSource then 3.0f
-        elif tags.Contains BodyPartTagDefOf.EatingSource then 2.5f
-        elif tags.Contains BodyPartTagDefOf.ConsciousnessSource then 2.0f
-        elif tags.Contains BodyPartTagDefOf.BloodPumpingSource then 1.5f
-        elif
-            tags.Contains BodyPartTagDefOf.BloodFiltrationLiver
-            || tags.Contains BodyPartTagDefOf.BloodFiltrationKidney
-            || tags.Contains BodyPartTagDefOf.BloodFiltrationSource
-        then
-            1.0f
-        elif tags.Contains BodyPartTagDefOf.MetabolismSource then 1.0f
-        else 2.0f
+            dict.Add(BodyPartTagDefOf.BreathingSource, 4.0f)
+            dict.Add(BodyPartTagDefOf.HearingSource, 3.0f)
+            dict.Add(BodyPartTagDefOf.EatingSource, 2.5f)
+            dict.Add(BodyPartTagDefOf.ConsciousnessSource, 2.0f)
+            dict.Add(BodyPartTagDefOf.BloodPumpingSource, 1.5f)
+            dict.Add(BodyPartTagDefOf.BloodFiltrationLiver, 1.0f)
+            dict.Add(BodyPartTagDefOf.BloodFiltrationKidney, 1.0f)
+            dict.Add(BodyPartTagDefOf.BloodFiltrationSource, 1.0f)
+            dict.Add(BodyPartTagDefOf.MetabolismSource, 1.0f)
+
+            dict
+
+    let private blastWeight (part: BodyPartRecord) =
+        let dict = blastWeightMap.Value
+        let mutable bestWeight = 2.0f
+
+        for tag in part.def.tags do
+            let mutable w = 0.0f
+
+            if dict.TryGetValue(tag, &w) && w > bestWeight then
+                bestWeight <- w
+
+        bestWeight
 
     let private partsToDamage (configuration: OverpressureSettingsDef) peakKPa partCount =
         let mutable bestThreshold = Single.MinValue
