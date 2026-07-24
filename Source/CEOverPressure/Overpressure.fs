@@ -7,6 +7,7 @@ open HarmonyLib
 open RimWorld
 open UnityEngine
 open Verse
+open Utils
 
 /// Applies blast overpressure effects to pawns near an explosion.
 /// Computes peak pressure via the Friedlander model, scales it by room enclosure
@@ -60,16 +61,17 @@ module internal Overpressure =
             (dict
                 [ BodyPartTagDefOf.BreathingSource, 4.0f
                   BodyPartTagDefOf.HearingSource, 3.0f
-                  BodyPartTagDefOf.EatingSource, 2.5f ])
+                  BodyPartTagDefOf.EatingSource, 2.5f
+                  BodyPartTagDefOf.ConsciousnessSource, 2.0f
+                  BodyPartTagDefOf.BloodPumpingSource, 1.5f ])
 
     let private blastWeight (part: BodyPartRecord) =
         let dict = blastWeightMap.Value
-
+    
         part.def.tags
-        |> Seq.choose (fun tag ->
-            let mutable w = 0.0f
-            if dict.TryGetValue(tag, &w) then Some w else None)
-        |> fun found -> if Seq.isEmpty found then 2.0f else Seq.max found
+        |> Seq.choose (tryGet dict)
+        |> tryMax
+        |> Option.defaultValue 2.0f
 
     let private partsToDamage (configuration: OverpressureSettingsDef) peakKPa partCount =
         let mutable bestThreshold = Single.MinValue
