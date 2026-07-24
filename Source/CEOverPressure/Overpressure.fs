@@ -44,8 +44,10 @@ module internal Overpressure =
             let sizeFactor = Mathf.Sqrt(Mathf.Clamp01(configuration.enclosedReferenceRoomCellCount / cellCount))
             1.0f + (configuration.maximumEnclosedReflectionMultiplier - 1.0f) * roofFraction * sizeFactor
 
-    let private log (configuration: OverpressureSettingsDef) message =
-        if configuration.enableLogging then
+    let private loggingEnabled = lazy (LoadedModManager.GetMod<CEOverPressureMod>().GetSettings<CEOverPressureSettings>().EnableLogging)
+
+    let private log message =
+        if loggingEnabled.Value then
             Log.Message message
 
     let private stun (configuration: OverpressureSettingsDef) (pawn: Pawn) peakKPa (instigator: Thing) =
@@ -91,16 +93,16 @@ module internal Overpressure =
 
                     let count = partsToDamage configuration peakKPa internalParts.Count
 
-                    log
-                        configuration
-                        (sprintf
+                    log (
+                        sprintf
                             "[CE-OverPressure] injured %O at %.1f kPa, %d/%d parts, %.1f dmg/part, ap=%.2f"
                             pawn
                             peakKPa
                             count
                             internalParts.Count
                             damagePerPart
-                            armorPenetration)
+                            armorPenetration
+                    )
 
                     let mutable index = 0
 
@@ -184,16 +186,16 @@ module internal Overpressure =
                         let blastRoom = RegionAndRoomQuery.RoomAt(center, map, RegionType.Set_Passable)
                         let enclosedMultiplier = roomMultiplier configuration blastRoom
 
-                        log
-                            configuration
-                            (sprintf
+                        log (
+                            sprintf
                                 "[CE-OverPressure] %O caused %.3fkg TNT blast at %O, pressureMult=%.2f, enclosedMult=%.2f, scanRadius=%.1f"
                                 instigator
                                 yieldKg
                                 center
                                 pressureMultiplier
                                 enclosedMultiplier
-                                scanRadius)
+                                scanRadius
+                        )
 
                         let maximumRegions = Mathf.CeilToInt(Mathf.PI * scanRadius * scanRadius) + 1
 

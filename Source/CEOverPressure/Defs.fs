@@ -145,9 +145,6 @@ type OverpressureSettingsDef() =
     val mutable injuryDamageDef: DamageDef
 
     [<Microsoft.FSharp.Core.DefaultValue>]
-    val mutable enableLogging: bool
-
-    [<Microsoft.FSharp.Core.DefaultValue>]
     val mutable injuryBands: List<InjuryBand>
 
     member internal this.ModelParameters =

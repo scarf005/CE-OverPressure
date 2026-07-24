@@ -13,6 +13,7 @@
   <ItemGroup>
     <Compile Include="PressureModel.fs" />
     <Compile Include="Defs.fs" />
+    <Compile Include="ModSettings.fs" />
     <Compile Include="Overpressure.fs" />
   </ItemGroup>
 
