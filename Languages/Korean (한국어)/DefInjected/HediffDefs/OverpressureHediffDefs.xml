@@ -1,14 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LanguageData>
-  <CEOP_Barotrauma.label>기압손상</CEOP_Barotrauma.label>
-  <CEOP_Barotrauma.labelNoun>기압손상</CEOP_Barotrauma.labelNoun>
-  <CEOP_Barotrauma.description>폭발 과압에 의한 내부 장기 손상입니다.</CEOP_Barotrauma.description>
+  <CEOP_Barotrauma.label>압력손상</CEOP_Barotrauma.label>
+  <CEOP_Barotrauma.labelNoun>압력손상</CEOP_Barotrauma.labelNoun>
+  <CEOP_Barotrauma.description>폭발 충격파로 인한 내부 장기 손상입니다.</CEOP_Barotrauma.description>
+  <CEOP_Barotrauma.labelTendedWell>붕대를 감음</CEOP_Barotrauma.labelTendedWell>
+  <CEOP_Barotrauma.labelTendedWellInner>봉합함</CEOP_Barotrauma.labelTendedWellInner>
+  <CEOP_Barotrauma.labelSolidTendedWell>접합됨</CEOP_Barotrauma.labelSolidTendedWell>
+  <CEOP_Barotrauma.permanentLabel>만성 압력손상</CEOP_Barotrauma.permanentLabel>
+  <CEOP_Barotrauma.destroyedLabel>파열됨</CEOP_Barotrauma.destroyedLabel>
 
-  <CEOP_BarotraumaSkin.label>기압손상</CEOP_BarotraumaSkin.label>
-  <CEOP_BarotraumaSkin.labelNoun>기압손상</CEOP_BarotraumaSkin.labelNoun>
-  <CEOP_BarotraumaSkin.description>폭발 과압에 의한 피부 손상입니다.</CEOP_BarotraumaSkin.description>
+  <CEOP_BarotraumaSkin.label>압력손상</CEOP_BarotraumaSkin.label>
+  <CEOP_BarotraumaSkin.labelNoun>압력손상</CEOP_BarotraumaSkin.labelNoun>
+  <CEOP_BarotraumaSkin.description>폭발 충격파로 인한 피부 손상입니다.</CEOP_BarotraumaSkin.description>
+  <CEOP_BarotraumaSkin.labelTendedWell>붕대를 감음</CEOP_BarotraumaSkin.labelTendedWell>
+  <CEOP_BarotraumaSkin.labelTendedWellInner>봉합함</CEOP_BarotraumaSkin.labelTendedWellInner>
+  <CEOP_BarotraumaSkin.labelSolidTendedWell>접합됨</CEOP_BarotraumaSkin.labelSolidTendedWell>
+  <CEOP_BarotraumaSkin.destroyedLabel>파괴됨</CEOP_BarotraumaSkin.destroyedLabel>
 
-  <CEOP_BarotraumaSolid.label>기압손상</CEOP_BarotraumaSolid.label>
-  <CEOP_BarotraumaSolid.labelNoun>기압손상</CEOP_BarotraumaSolid.labelNoun>
-  <CEOP_BarotraumaSolid.description>폭발 과압에 의한 뼈/연골 손상입니다.</CEOP_BarotraumaSolid.description>
+  <CEOP_BarotraumaSolid.label>압력손상</CEOP_BarotraumaSolid.label>
+  <CEOP_BarotraumaSolid.labelNoun>압력손상</CEOP_BarotraumaSolid.labelNoun>
+  <CEOP_BarotraumaSolid.description>폭발 충격파로 인한 뼈/연골 손상입니다.</CEOP_BarotraumaSolid.description>
+  <CEOP_BarotraumaSolid.destroyedLabel>파괴됨</CEOP_BarotraumaSolid.destroyedLabel>
 </LanguageData>
