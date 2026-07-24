@@ -182,7 +182,7 @@ module internal Overpressure =
 
                         Log.Message(
                             sprintf
-                                "[CE-OverPressure] %O caused %.1fkg TNT blast at %O, pressureMult=%.2f, enclosedMult=%.2f, scanRadius=%.1f"
+                                "[CE-OverPressure] %O caused %.3fkg TNT blast at %O, pressureMult=%.2f, enclosedMult=%.2f, scanRadius=%.1f"
                                 instigator
                                 yieldKg
                                 center

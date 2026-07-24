@@ -37,7 +37,7 @@ let assertNear expected actual tolerance message =
     if abs (expected - actual) > tolerance then
         failwithf "%s: expected %f, got %f" message expected actual
 
-assertNear 1.0f (PressureModel.estimateYieldKg parameters 100 2.5f) 0.0001f "one-kilogram reference yield"
-assertNear 1.8661f (PressureModel.estimateYieldKg parameters 100 5.0f) 0.001f "radius contribution"
+assertNear 0.324f (PressureModel.estimateYieldKg parameters 100 2.5f) 0.001f "reference yield at 100 dmg, 2.5 rad"
+assertNear 0.472f (PressureModel.estimateYieldKg parameters 100 5.0f) 0.001f "radius contribution at 5.0 rad"
 assertNear 0.0f (PressureModel.estimateYieldKg parameters 0 2.5f) 0.0f "zero damage yield"
 assertNear 65.2937f (PressureModel.peakPressureKPa parameters 4.0f 2.2f) 0.01f "pressure at four metres"

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+  <CEOP_Barotrauma.label>기압손상</CEOP_Barotrauma.label>
+  <CEOP_Barotrauma.labelNoun>기압손상</CEOP_Barotrauma.labelNoun>
+  <CEOP_Barotrauma.description>폭발 과압에 의한 내부 장기 손상입니다.</CEOP_Barotrauma.description>
+
+  <CEOP_BarotraumaSkin.label>기압손상</CEOP_BarotraumaSkin.label>
+  <CEOP_BarotraumaSkin.labelNoun>기압손상</CEOP_BarotraumaSkin.labelNoun>
+  <CEOP_BarotraumaSkin.description>폭발 과압에 의한 피부 손상입니다.</CEOP_BarotraumaSkin.description>
+
+  <CEOP_BarotraumaSolid.label>기압손상</CEOP_BarotraumaSolid.label>
+  <CEOP_BarotraumaSolid.labelNoun>기압손상</CEOP_BarotraumaSolid.labelNoun>
+  <CEOP_BarotraumaSolid.description>폭발 과압에 의한 뼈/연골 손상입니다.</CEOP_BarotraumaSolid.description>
+</LanguageData>

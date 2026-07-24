@@ -3,10 +3,10 @@
   <CEOverPressure.OverpressureSettingsDef>
     <defName>CEOP_DefaultSettings</defName>
     <metresPerCell>0.8</metresPerCell>
-    <damagePerKgTnt>100</damagePerKgTnt>
+    <damagePerKgTnt>236</damagePerKgTnt>
     <radiusMetresPerKgTnt>2</radiusMetresPerKgTnt>
-    <yieldExponent>1.35</yieldExponent>
-    <damageYieldWeight>0.7</damageYieldWeight>
+    <yieldExponent>1.60</yieldExponent>
+    <damageYieldWeight>0.82</damageYieldWeight>
     <minimumYieldKg>0.02</minimumYieldKg>
     <maximumYieldKg>1000</maximumYieldKg>
     <minimumPressureYieldKg>0.001</minimumPressureYieldKg>
@@ -26,7 +26,7 @@
     <groundReflectionMultiplier>1.35</groundReflectionMultiplier>
     <maximumEnclosedReflectionMultiplier>1.35</maximumEnclosedReflectionMultiplier>
     <enclosedReferenceRoomCellCount>25</enclosedReferenceRoomCellCount>
-    <thermobaricPressureMultiplier>1.45</thermobaricPressureMultiplier>
+    <thermobaricPressureMultiplier>1.0</thermobaricPressureMultiplier>
     <stunThresholdKPa>25</stunThresholdKPa>
     <injuryThresholdKPa>35</injuryThresholdKPa>
     <minimumStunTicks>30</minimumStunTicks>

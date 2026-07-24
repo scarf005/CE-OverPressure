@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Patch>
+  <Operation Class="PatchOperationFindMod">
+    <mods>
+      <li>Combat Extended</li>
+    </mods>
+    <match Class="PatchOperationSequence">
+      <operations>
+
+        <!-- 30x64mm Fuel Cell thermobaric -->
+        <li Class="PatchOperationAddModExtension">
+          <xpath>/Defs/ThingDef[defName="Bullet_30x64mmFuel_Thermobaric"]</xpath>
+          <value>
+            <li Class="CEOverPressure.OverpressureExtension">
+              <tntEquivalentKg>0.035</tntEquivalentKg>
+            </li>
+          </value>
+        </li>
+
+        <!-- 57mm S5 rocket thermobaric -->
+        <li Class="PatchOperationAddModExtension">
+          <xpath>/Defs/ThingDef[defName="Bullet_57mmRocket_Thermobaric" or defName="Bullet_57mmRocket_Thermobaric_indirect"]</xpath>
+          <value>
+            <li Class="CEOverPressure.OverpressureExtension">
+              <tntEquivalentKg>0.40</tntEquivalentKg>
+            </li>
+          </value>
+        </li>
+
+        <!-- 80mm S8 rocket thermobaric -->
+        <li Class="PatchOperationAddModExtension">
+          <xpath>/Defs/ThingDef[defName="Bullet_80mmRocket_Thermobaric" or defName="Bullet_80mmRocket_Thermobaric_indirect"]</xpath>
+          <value>
+            <li Class="CEOverPressure.OverpressureExtension">
+              <tntEquivalentKg>1.0</tntEquivalentKg>
+            </li>
+          </value>
+        </li>
+
+        <!-- 83mm SMAW thermobaric -->
+        <li Class="PatchOperationAddModExtension">
+          <xpath>/Defs/ThingDef[defName="Bullet_83mmSMAW_Thermobaric"]</xpath>
+          <value>
+            <li Class="CEOverPressure.OverpressureExtension">
+              <tntEquivalentKg>1.5</tntEquivalentKg>
+            </li>
+          </value>
+        </li>
+
+        <!-- 84mm Carl Gustav thermobaric -->
+        <li Class="PatchOperationAddModExtension">
+          <xpath>/Defs/ThingDef[defName="Bullet_84x246mmR_Thermobaric"]</xpath>
+          <value>
+            <li Class="CEOverPressure.OverpressureExtension">
+              <tntEquivalentKg>0.6</tntEquivalentKg>
+            </li>
+          </value>
+        </li>
+
+        <!-- RPG-7 thermobaric (TBG-7V) -->
+        <li Class="PatchOperationAddModExtension">
+          <xpath>/Defs/ThingDef[defName="Bullet_RPG7Grenade_Thermobaric"]</xpath>
+          <value>
+            <li Class="CEOverPressure.OverpressureExtension">
+              <tntEquivalentKg>1.8</tntEquivalentKg>
+            </li>
+          </value>
+        </li>
+
+        <!-- RPG-32 thermobaric -->
+        <li Class="PatchOperationAddModExtension">
+          <xpath>/Defs/ThingDef[defName="Bullet_RPG32Rocket_Thermobaric"]</xpath>
+          <value>
+            <li Class="CEOverPressure.OverpressureExtension">
+              <tntEquivalentKg>1.8</tntEquivalentKg>
+            </li>
+          </value>
+        </li>
+
+        <!-- SPG-9 thermobaric -->
+        <li Class="PatchOperationAddModExtension">
+          <xpath>/Defs/ThingDef[defName="Bullet_SPG9Rocket_Thermobaric"]</xpath>
+          <value>
+            <li Class="CEOverPressure.OverpressureExtension">
+              <tntEquivalentKg>2.0</tntEquivalentKg>
+            </li>
+          </value>
+        </li>
+
+        <!-- RPO-A Shmel thermobaric -->
+        <li Class="PatchOperationAddModExtension">
+          <xpath>/Defs/ThingDef[defName="Bullet_RPO_A_Grenade"]</xpath>
+          <value>
+            <li Class="CEOverPressure.OverpressureExtension">
+              <tntEquivalentKg>2.1</tntEquivalentKg>
+            </li>
+          </value>
+        </li>
+
+        <!-- Charged rocket thermobaric -->
+        <li Class="PatchOperationAddModExtension">
+          <xpath>/Defs/ThingDef[defName="Bullet_ThermobaricRocket"]</xpath>
+          <value>
+            <li Class="CEOverPressure.OverpressureExtension">
+              <tntEquivalentKg>1.0</tntEquivalentKg>
+            </li>
+          </value>
+        </li>
+
+        <!-- 105mm howitzer incendiary (thermobaric comp explosion) -->
+        <li Class="PatchOperationAddModExtension">
+          <xpath>/Defs/ThingDef[defName="Bullet_105mmHowitzerShell_Incendiary" or defName="Bullet_105mmHowitzerShell_Incendiary_directfire"]</xpath>
+          <value>
+            <li Class="CEOverPressure.OverpressureExtension">
+              <tntEquivalentKg>4.0</tntEquivalentKg>
+            </li>
+          </value>
+        </li>
+
+        <!-- 152mm howitzer incendiary (thermobaric comp explosion) -->
+        <li Class="PatchOperationAddModExtension">
+          <xpath>/Defs/ThingDef[defName="Bullet_152mmHowitzerShell_Incendiary" or defName="Bullet_152mmHowitzerShell_Incendiary_directfire"]</xpath>
+          <value>
+            <li Class="CEOverPressure.OverpressureExtension">
+              <tntEquivalentKg>8.0</tntEquivalentKg>
+            </li>
+          </value>
+        </li>
+
+        <!-- 155mm howitzer incendiary (thermobaric comp explosion) -->
+        <li Class="PatchOperationAddModExtension">
+          <xpath>/Defs/ThingDef[defName="Bullet_155mmHowitzerShell_Incendiary" or defName="Bullet_155mmHowitzerShell_Incendiary_directfire"]</xpath>
+          <value>
+            <li Class="CEOverPressure.OverpressureExtension">
+              <tntEquivalentKg>9.0</tntEquivalentKg>
+            </li>
+          </value>
+        </li>
+
+      </operations>
+    </match>
+  </Operation>
+</Patch>
