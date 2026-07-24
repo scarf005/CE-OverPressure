@@ -4,6 +4,8 @@ open System.Collections.Generic
 open RimWorld
 open Verse
 
+/// Mod extension for projectile defs. Allows overriding the TNT-equivalent yield,
+/// pressure multiplier, or disabling overpressure for a specific projectile.
 [<AllowNullLiteral>]
 type OverpressureExtension() as this =
     inherit DefModExtension()
@@ -21,6 +23,8 @@ type OverpressureExtension() as this =
         this.tntEquivalentKg <- -1.0f
         this.pressureMultiplier <- 1.0f
 
+/// Defines a pressure threshold and the maximum number of internal body parts
+/// to damage when peak overpressure exceeds that threshold.
 [<AllowNullLiteral>]
 type InjuryBand() =
     [<Microsoft.FSharp.Core.DefaultValue>]
@@ -29,6 +33,8 @@ type InjuryBand() =
     [<Microsoft.FSharp.Core.DefaultValue>]
     val mutable maximumParts: int
 
+/// Def that configures all overpressure model parameters, damage settings,
+/// room-reflection multipliers, and injury-band thresholds.
 [<AllowNullLiteral>]
 type OverpressureSettingsDef() =
     inherit Def()

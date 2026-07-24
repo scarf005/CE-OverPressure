@@ -2,6 +2,8 @@ namespace CEOverPressure
 
 open System
 
+/// Parameters for the Friedlander-equation pressure model used to compute
+/// peak overpressure at a given distance from an explosion.
 [<Struct>]
 type internal PressureModelParameters =
     { MetresPerCell: float32
@@ -27,6 +29,9 @@ module internal PressureModel =
     let private power value exponent = Math.Pow(float value, float exponent) |> float32
     let private cubeRoot value = power value (1.0f / 3.0f)
 
+    /// Estimates the TNT-equivalent yield (kg) from the observed damage and blast radius.
+    /// Uses a weighted geometric mean of damage-derived and radius-derived yields,
+    /// clamped to the configured minimum and maximum yield bounds.
     let estimateYieldKg parameters damage radiusCells =
         if damage <= 0 || radiusCells <= 0.0f then
             0.0f
@@ -40,6 +45,8 @@ module internal PressureModel =
 
     let pressureRangeCells parameters yieldKg = parameters.RangeCoefficientMetres * cubeRoot yieldKg / parameters.MetresPerCell
 
+    /// Computes peak overpressure (kPa) at a given distance from an explosion
+    /// using a piecewise cubic Friedlander approximation.
     let peakPressureKPa parameters distanceMetres tntEquivalentKg =
         let cubeRootYield = cubeRoot (max tntEquivalentKg parameters.MinimumPressureYieldKg)
         let scaledDistance = max parameters.MinimumScaledDistance (distanceMetres / cubeRootYield)

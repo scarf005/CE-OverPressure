@@ -8,6 +8,9 @@ open RimWorld
 open UnityEngine
 open Verse
 
+/// Applies blast overpressure effects to pawns near an explosion.
+/// Computes peak pressure via the Friedlander model, scales it by room enclosure
+/// and ground reflection, then applies stuns and internal injuries to affected pawns.
 module internal Overpressure =
     let private settings = lazy DefDatabase<OverpressureSettingsDef>.AllDefsListForReading[0]
 
@@ -19,6 +22,8 @@ module internal Overpressure =
             | null -> None
             | extension -> Some extension
 
+    /// Estimates TNT-equivalent yield, preferring an explicit extension value
+    /// over the damage-and-radius-based model estimate.
     let private estimateYieldKg parameters damage radius (extension: OverpressureExtension option) =
         match extension with
         | Some value when value.tntEquivalentKg > 0.0f -> value.tntEquivalentKg
@@ -27,6 +32,8 @@ module internal Overpressure =
     let private isThermobaric (damageDef: DamageDef) =
         damageDef.isExplosive && not (isNull damageDef.workerClass) && typeof<DamageWorker_Flame>.IsAssignableFrom damageDef.workerClass
 
+    /// Computes the enclosed-room pressure multiplier based on cell count and roof coverage.
+    /// More enclosed rooms amplify overpressure through wave reflection.
     let private roomMultiplier (configuration: OverpressureSettingsDef) (room: Room) =
         if isNull room || not room.ProperRoom || room.UsesOutdoorTemperature || room.CellCount <= 0 then
             1.0f
@@ -55,6 +62,8 @@ module internal Overpressure =
 
         result
 
+    /// Applies overpressure injuries to a pawn: stuns at moderate pressure,
+    /// damages randomly-selected internal body parts at high pressure.
     let private applyInjuries (configuration: OverpressureSettingsDef) (pawn: Pawn) peakKPa (instigator: Thing) =
         if peakKPa >= configuration.stunThresholdKPa then
             if peakKPa < configuration.injuryThresholdKPa then
@@ -120,6 +129,9 @@ module internal Overpressure =
 
             applyInjuries configuration pawn (peakKPa * pressureMultiplier) instigator
 
+    /// Main entry point for blast overpressure effects.
+    /// Traverses the map region graph from the explosion center, collects pawns,
+    /// and applies pressure-based stuns and internal injuries to each affected pawn.
     let apply (center: IntVec3) (map: Map) (radius: float32) (damageDef: DamageDef) (instigator: Thing) (damage: int) (projectile: ThingDef) (height: float32) =
         if not (isNull map) && center.InBounds map && not (isNull damageDef) then
             let configuration = settings.Value
