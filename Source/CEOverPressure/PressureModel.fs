@@ -4,6 +4,7 @@ open System
 
 /// Parameters for the Friedlander-equation pressure model used to compute
 /// peak overpressure at a given distance from an explosion.
+/// See https://en.wikipedia.org/wiki/Friedlander_equation
 [<Struct>]
 type internal PressureModelParameters =
     { MetresPerCell: float32
@@ -47,6 +48,7 @@ module internal PressureModel =
 
     /// Computes peak overpressure (kPa) at a given distance from an explosion
     /// using a piecewise cubic Friedlander approximation.
+    /// See https://en.wikipedia.org/wiki/Friedlander_equation
     let peakPressureKPa parameters distanceMetres tntEquivalentKg =
         let cubeRootYield = cubeRoot (max tntEquivalentKg parameters.MinimumPressureYieldKg)
         let scaledDistance = max parameters.MinimumScaledDistance (distanceMetres / cubeRootYield)

@@ -11,6 +11,7 @@ open Verse
 /// Applies blast overpressure effects to pawns near an explosion.
 /// Computes peak pressure via the Friedlander model, scales it by room enclosure
 /// and ground reflection, then applies stuns and internal injuries to affected pawns.
+/// See https://en.wikipedia.org/wiki/Friedlander_equation
 module internal Overpressure =
     let private settings = lazy DefDatabase<OverpressureSettingsDef>.AllDefsListForReading[0]
 
