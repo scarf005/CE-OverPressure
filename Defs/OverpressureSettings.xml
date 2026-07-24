@@ -37,6 +37,7 @@
     <maximumDamagePerPart>30</maximumDamagePerPart>
     <armorPenetrationReferencePressureKPa>1000</armorPenetrationReferencePressureKPa>
     <injuryDamageDef>CEOP_Overpressure</injuryDamageDef>
+    <enableLogging>false</enableLogging>
     <injuryBands>
       <li>
         <minimumPressureKPa>35</minimumPressureKPa>
