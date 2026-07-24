@@ -66,5 +66,6 @@
     <hediffSkin>CEOP_BarotraumaSkin</hediffSkin>
     <hediffSolid>CEOP_BarotraumaSolid</hediffSolid>
     <bluntStunDuration>0</bluntStunDuration>
+    <harmAllLayersUntilOutside>false</harmAllLayersUntilOutside>
   </DamageDef>
 </Defs>
