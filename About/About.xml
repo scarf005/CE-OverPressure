@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ModMetaData>
-  <name>CE OverPressure</name>
+  <name>Combat Extended OverPressure</name>
   <author>scarf</author>
   <packageId>scarf.CombatExtended.OverPressure</packageId>
   <modVersion>1.0.0</modVersion>

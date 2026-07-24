@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+  <HediffDef ParentName="InjuryBase">
+    <defName>CEOP_Barotrauma</defName>
+    <label>barotrauma</label>
+    <labelNoun>barotrauma</labelNoun>
+    <description>Internal injury from an overpressure blast wave.</description>
+    <comps>
+      <li Class="HediffCompProperties_TendDuration">
+        <labelTendedWell>bandaged</labelTendedWell>
+        <labelTendedWellInner>sutured</labelTendedWellInner>
+        <labelSolidTendedWell>set</labelSolidTendedWell>
+      </li>
+      <li Class="HediffCompProperties_GetsPermanent">
+        <permanentLabel>chronic barotrauma</permanentLabel>
+      </li>
+    </comps>
+    <injuryProps>
+      <painPerSeverity>0.0125</painPerSeverity>
+      <averagePainPerSeverityPermanent>0.00625</averagePainPerSeverityPermanent>
+      <bleedRate>0.01</bleedRate>
+      <canMerge>true</canMerge>
+      <destroyedLabel>Ruptured</destroyedLabel>
+    </injuryProps>
+  </HediffDef>
+
+  <HediffDef ParentName="InjuryBase">
+    <defName>CEOP_BarotraumaSkin</defName>
+    <label>barotrauma</label>
+    <labelNoun>barotrauma</labelNoun>
+    <description>Skin injury from an overpressure blast wave.</description>
+    <comps>
+      <li Class="HediffCompProperties_TendDuration">
+        <labelTendedWell>bandaged</labelTendedWell>
+        <labelTendedWellInner>tended</labelTendedWellInner>
+        <labelSolidTendedWell>set</labelSolidTendedWell>
+      </li>
+    </comps>
+    <injuryProps>
+      <painPerSeverity>0.0125</painPerSeverity>
+      <averagePainPerSeverityPermanent>0.00625</averagePainPerSeverityPermanent>
+      <canMerge>false</canMerge>
+      <destroyedLabel>Destroyed</destroyedLabel>
+    </injuryProps>
+  </HediffDef>
+
+  <HediffDef ParentName="InjuryBase">
+    <defName>CEOP_BarotraumaSolid</defName>
+    <label>barotrauma</label>
+    <labelNoun>barotrauma</labelNoun>
+    <description>Solid-tissue injury from an overpressure blast wave.</description>
+    <injuryProps>
+      <painPerSeverity>0.0125</painPerSeverity>
+      <averagePainPerSeverityPermanent>0.00625</averagePainPerSeverityPermanent>
+      <canMerge>false</canMerge>
+      <destroyedLabel>Destroyed</destroyedLabel>
+    </injuryProps>
+  </HediffDef>
+
+  <DamageDef ParentName="BluntBase">
+    <defName>CEOP_Overpressure</defName>
+    <label>overpressure</label>
+    <workerClass>DamageWorker_AddInjury</workerClass>
+    <deathMessage>{0} has been killed by an overpressure blast wave.</deathMessage>
+    <hediff>CEOP_Barotrauma</hediff>
+    <hediffSkin>CEOP_BarotraumaSkin</hediffSkin>
+    <hediffSolid>CEOP_BarotraumaSolid</hediffSolid>
+    <bluntStunDuration>0</bluntStunDuration>
+  </DamageDef>
+</Defs>

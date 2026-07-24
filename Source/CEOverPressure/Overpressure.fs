@@ -65,7 +65,7 @@ module internal Overpressure =
 
     /// Applies overpressure injuries to a pawn: stuns at moderate pressure,
     /// damages randomly-selected internal body parts at high pressure.
-    let private applyInjuries (configuration: OverpressureSettingsDef) (pawn: Pawn) peakKPa (instigator: Thing) =
+    let private applyInjuries (configuration: OverpressureSettingsDef) (pawn: Pawn) peakKPa armorPenetration (instigator: Thing) =
         if peakKPa >= configuration.stunThresholdKPa then
             if peakKPa < configuration.injuryThresholdKPa then
                 Log.Message(sprintf "[CE-OverPressure] stunned %O at %.1f kPa" pawn peakKPa)
@@ -88,7 +88,14 @@ module internal Overpressure =
                     let count = partsToDamage configuration peakKPa internalParts.Count
 
                     Log.Message(
-                        sprintf "[CE-OverPressure] injured %O at %.1f kPa, %d/%d parts, %.1f dmg/part" pawn peakKPa count internalParts.Count damagePerPart
+                        sprintf
+                            "[CE-OverPressure] injured %O at %.1f kPa, %d/%d parts, %.1f dmg/part, ap=%.2f"
+                            pawn
+                            peakKPa
+                            count
+                            internalParts.Count
+                            damagePerPart
+                            armorPenetration
                     )
 
                     let mutable index = 0
@@ -99,9 +106,7 @@ module internal Overpressure =
                         internalParts[selectedIndex] <- internalParts[index]
                         internalParts[index] <- part
 
-                        DamageInfo(configuration.injuryDamageDef, damagePerPart, configuration.armorPenetration, -1.0f, instigator, part)
-                        |> pawn.TakeDamage
-                        |> ignore
+                        DamageInfo(configuration.injuryDamageDef, damagePerPart, armorPenetration, -1.0f, instigator, part) |> pawn.TakeDamage |> ignore
 
                         index <- index + 1
 
@@ -122,6 +127,7 @@ module internal Overpressure =
         (blastRoom: Room)
         enclosedMultiplier
         (instigator: Thing)
+        armorPenetration
         (pawn: Pawn)
         =
         if not pawn.Dead && pawn.Spawned && pawn.Position.InHorDistOf(center, scanRadius) && GenSight.LineOfSight(center, pawn.Position, map, true) then
@@ -134,12 +140,24 @@ module internal Overpressure =
             if enclosedMultiplier > 1.0f && obj.ReferenceEquals(blastRoom, pawn.GetRoom()) then
                 peakKPa <- peakKPa * enclosedMultiplier
 
-            applyInjuries configuration pawn (peakKPa * pressureMultiplier) instigator
+            let scaledAP = armorPenetration * Mathf.Clamp01(peakKPa / configuration.armorPenetrationReferencePressureKPa)
+
+            applyInjuries configuration pawn (peakKPa * pressureMultiplier) scaledAP instigator
 
     /// Main entry point for blast overpressure effects.
     /// Traverses the map region graph from the explosion center, collects pawns,
     /// and applies pressure-based stuns and internal injuries to each affected pawn.
-    let apply (center: IntVec3) (map: Map) (radius: float32) (damageDef: DamageDef) (instigator: Thing) (damage: int) (projectile: ThingDef) (height: float32) =
+    let apply
+        (center: IntVec3)
+        (map: Map)
+        (radius: float32)
+        (damageDef: DamageDef)
+        (instigator: Thing)
+        (damage: int)
+        (armorPenetration: float32)
+        (projectile: ThingDef)
+        (height: float32)
+        =
         if not (isNull map) && center.InBounds map && not (isNull damageDef) then
             let configuration = settings.Value
             let extension = extensionFor projectile
@@ -201,6 +219,7 @@ module internal Overpressure =
                                                 blastRoom
                                                 enclosedMultiplier
                                                 instigator
+                                                armorPenetration
                                                 pawn
                                         | _ -> ()
 
@@ -213,8 +232,19 @@ module internal Overpressure =
 
 [<HarmonyPatch(typeof<GenExplosionCE>, nameof GenExplosionCE.DoExplosion)>]
 module internal GenExplosionCEPatch =
-    let Postfix (center: IntVec3, map: Map, radius: float32, damType: DamageDef, instigator: Thing, damAmount: int, projectile: ThingDef, height: float32) =
-        Overpressure.apply center map radius damType instigator damAmount projectile height
+    let Postfix
+        (
+            center: IntVec3,
+            map: Map,
+            radius: float32,
+            damType: DamageDef,
+            instigator: Thing,
+            damAmount: int,
+            armorPenetration: float32,
+            projectile: ThingDef,
+            height: float32
+        ) =
+        Overpressure.apply center map radius damType instigator damAmount armorPenetration projectile height
 
 [<StaticConstructorOnStartup>]
 type CEOverPressureBootstrap() =

@@ -35,8 +35,8 @@
     <damagePressureDivisor>8</damagePressureDivisor>
     <minimumDamagePerPart>2</minimumDamagePerPart>
     <maximumDamagePerPart>30</maximumDamagePerPart>
-    <armorPenetration>999</armorPenetration>
-    <injuryDamageDef>Blunt</injuryDamageDef>
+    <armorPenetrationReferencePressureKPa>1000</armorPenetrationReferencePressureKPa>
+    <injuryDamageDef>CEOP_Overpressure</injuryDamageDef>
     <injuryBands>
       <li>
         <minimumPressureKPa>35</minimumPressureKPa>

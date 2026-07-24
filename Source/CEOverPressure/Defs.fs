@@ -139,7 +139,7 @@ type OverpressureSettingsDef() =
     val mutable maximumDamagePerPart: float32
 
     [<Microsoft.FSharp.Core.DefaultValue>]
-    val mutable armorPenetration: float32
+    val mutable armorPenetrationReferencePressureKPa: float32
 
     [<Microsoft.FSharp.Core.DefaultValue>]
     val mutable injuryDamageDef: DamageDef
