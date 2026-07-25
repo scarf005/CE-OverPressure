@@ -89,7 +89,7 @@ module internal Overpressure =
 
     /// Applies overpressure injuries to a pawn: stuns at moderate pressure,
     /// damages randomly-selected internal body parts at high pressure.
-    let private applyInjuries (configuration: OverpressureSettingsDef) (pawn: Pawn) peakKPa armorPenetration (instigator: Thing) =
+    let private applyInjuries (configuration: OverpressureSettingsDef) (pawn: Pawn) peakKPa armorPenetration (instigator: Thing) (projectile: ThingDef) =
         if peakKPa >= configuration.stunThresholdKPa then
             if peakKPa < configuration.injuryThresholdKPa then
                 Log.Message(sprintf "[CE-OverPressure] stunned %O at %.1f kPa" pawn peakKPa)
@@ -136,7 +136,7 @@ module internal Overpressure =
                         weightedParts[selectedIndex] <- weightedParts[index]
                         weightedParts[index] <- part
 
-                        DamageInfo(configuration.injuryDamageDef, damagePerPart, armorPenetration, -1.0f, instigator, part) |> pawn.TakeDamage |> ignore
+                        DamageInfo(configuration.injuryDamageDef, damagePerPart, armorPenetration, -1.0f, instigator, part, projectile) |> pawn.TakeDamage |> ignore
 
                         index <- index + 1
 
@@ -159,6 +159,7 @@ module internal Overpressure =
         (instigator: Thing)
         armorPenetration
         (pawn: Pawn)
+        (projectile: ThingDef)
         =
         if not pawn.Dead && pawn.Spawned && pawn.Position.InHorDistOf(center, scanRadius) && GenSight.LineOfSight(center, pawn.Position, map, true) then
             let distanceCells = max configuration.minimumDistanceCells (pawn.Position.DistanceTo center)
@@ -172,7 +173,7 @@ module internal Overpressure =
 
             let scaledAP = armorPenetration * Mathf.Clamp01(peakKPa / configuration.armorPenetrationReferencePressureKPa)
 
-            applyInjuries configuration pawn (peakKPa * pressureMultiplier) scaledAP instigator
+            applyInjuries configuration pawn (peakKPa * pressureMultiplier) scaledAP instigator projectile
 
     /// Main entry point for blast overpressure effects.
     /// Traverses the map region graph from the explosion center, collects pawns,
@@ -251,6 +252,7 @@ module internal Overpressure =
                                                 instigator
                                                 armorPenetration
                                                 pawn
+                                                projectile
                                         | _ -> ()
 
                                     false),
