@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+  <CEOP_CombatLogImpact>{initiator}이(가) {recipient}에게 폭발 충격파로 압력손상을 입힘</CEOP_CombatLogImpact>
+  <CEOP_CombatLogImpactWithWeapon>{initiator}이(가) {weapon}(으)로 {recipient}에게 압력손상을 입힘</CEOP_CombatLogImpactWithWeapon>
+</LanguageData>

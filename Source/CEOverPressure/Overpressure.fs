@@ -9,6 +9,26 @@ open UnityEngine
 open Verse
 open Utils
 
+type BattleLogEntry_OverpressureImpact(initialInitiator: Thing, initialRecipient: Pawn, initialWeapon: ThingDef, damageDef: DamageDef) =
+    inherit BattleLogEntry_ExplosionImpact(initialInitiator, initialRecipient, initialWeapon, initialWeapon, damageDef)
+
+    let mutable initiator = initialInitiator
+    let mutable recipient = initialRecipient
+    let mutable weapon = initialWeapon
+
+    new() = BattleLogEntry_OverpressureImpact(null, null, null, null)
+
+    override this.ToGameStringFromPOV_Worker(pov, forceLog) =
+        if isNull initiator || isNull recipient then base.ToGameStringFromPOV_Worker(pov, forceLog)
+        elif isNull weapon then "CEOP_CombatLogImpact".Translate(initiator.Named("initiator"), recipient.Named("recipient")).Resolve()
+        else "CEOP_CombatLogImpactWithWeapon".Translate(initiator.Named("initiator"), recipient.Named("recipient"), weapon.Named("weapon")).Resolve()
+
+    override this.ExposeData() =
+        base.ExposeData()
+        Scribe_References.Look(&initiator, "ceopInitiator", true)
+        Scribe_References.Look(&recipient, "ceopRecipient", true)
+        Scribe_Defs.Look(&weapon, "ceopWeapon")
+
 /// Applies blast overpressure effects to pawns near an explosion.
 /// Computes peak pressure via the Friedlander model, scales it by room enclosure
 /// and ground reflection, then applies stuns and internal injuries to affected pawns.
@@ -109,11 +129,13 @@ module internal Overpressure =
     /// damages randomly-selected internal body parts at high pressure.
     let private applyInjuries (configuration: OverpressureSettingsDef) (pawn: Pawn) peakKPa armorPenetration (instigator: Thing) (projectile: ThingDef) =
         if peakKPa >= configuration.stunThresholdKPa then
+            let initiator = resolveInitiator instigator
+
             if peakKPa < configuration.injuryThresholdKPa then
                 Log.Message(sprintf "[CE-OverPressure] stunned %O at %.1f kPa" pawn peakKPa)
-                stun configuration pawn peakKPa instigator
+                stun configuration pawn peakKPa initiator
             else
-                stun configuration pawn peakKPa instigator
+                stun configuration pawn peakKPa initiator
 
                 let weightedParts = SimplePool<List<BodyPartRecord>>.Get()
 
@@ -148,9 +170,7 @@ module internal Overpressure =
                             armorPenetration
                     )
 
-                    let initiator = resolveInitiator instigator
-
-                    let battleLogEntry = BattleLogEntry_ExplosionImpact(initiator, pawn, projectile, projectile, configuration.injuryDamageDef)
+                    let battleLogEntry = BattleLogEntry_OverpressureImpact(initiator, pawn, projectile, configuration.injuryDamageDef)
 
                     Find.BattleLog.Add(battleLogEntry)
 
@@ -163,7 +183,7 @@ module internal Overpressure =
                         weightedParts[index] <- part
 
                         let damageResult =
-                            pawn.TakeDamage(DamageInfo(configuration.injuryDamageDef, damagePerPart, armorPenetration, -1.0f, instigator, part, projectile))
+                            pawn.TakeDamage(DamageInfo(configuration.injuryDamageDef, damagePerPart, armorPenetration, -1.0f, initiator, part, projectile))
 
                         associateCombatLog battleLogEntry damageResult pawn part
 
@@ -289,21 +309,22 @@ module internal Overpressure =
                             processedPawns.Clear()
                             SimplePool<HashSet<Pawn>>.Return processedPawns
 
-[<HarmonyPatch(typeof<GenExplosionCE>, nameof GenExplosionCE.DoExplosion)>]
-module internal GenExplosionCEPatch =
-    let Postfix
-        (
-            center: IntVec3,
-            map: Map,
-            radius: float32,
-            damType: DamageDef,
-            instigator: Thing,
-            damAmount: int,
-            armorPenetration: float32,
-            projectile: ThingDef,
-            height: float32
-        ) =
-        Overpressure.apply center map radius damType instigator damAmount armorPenetration projectile height
+[<HarmonyPatch(typeof<Explosion>, "ExplosionEnded")>]
+module internal ExplosionPatch =
+    let Postfix (__instance: Explosion) =
+        match __instance with
+        | :? ExplosionCE as explosion ->
+            Overpressure.apply
+                explosion.Position
+                explosion.Map
+                explosion.radius
+                explosion.damType
+                explosion.instigator
+                explosion.damAmount
+                explosion.armorPenetration
+                explosion.projectile
+                explosion.height
+        | _ -> ()
 
 [<StaticConstructorOnStartup>]
 type CEOverPressureBootstrap() =

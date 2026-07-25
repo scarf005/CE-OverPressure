@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+  <CEOP_CombatLogImpact>{initiator} injured {recipient} with an overpressure blast.</CEOP_CombatLogImpact>
+  <CEOP_CombatLogImpactWithWeapon>{initiator} injured {recipient} with an overpressure blast from {weapon}.</CEOP_CombatLogImpactWithWeapon>
+</LanguageData>
