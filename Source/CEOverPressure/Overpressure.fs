@@ -67,11 +67,8 @@ module internal Overpressure =
 
     let private blastWeight (part: BodyPartRecord) =
         let dict = blastWeightMap.Value
-    
-        part.def.tags
-        |> Seq.choose (tryGet dict)
-        |> tryMax
-        |> Option.defaultValue 2.0f
+
+        part.def.tags |> Seq.choose (tryGet dict) |> tryMax |> Option.defaultValue 2.0f
 
     let private partsToDamage (configuration: OverpressureSettingsDef) peakKPa partCount =
         let mutable bestThreshold = Single.MinValue
@@ -128,6 +125,10 @@ module internal Overpressure =
                             armorPenetration
                     )
 
+                    let battleLogEntry = BattleLogEntry_ExplosionImpact(instigator, pawn, projectile, projectile, configuration.injuryDamageDef)
+
+                    Find.BattleLog.Add(battleLogEntry)
+
                     let mutable index = 0
 
                     while index < count && not pawn.Dead do
@@ -136,7 +137,10 @@ module internal Overpressure =
                         weightedParts[selectedIndex] <- weightedParts[index]
                         weightedParts[index] <- part
 
-                        DamageInfo(configuration.injuryDamageDef, damagePerPart, armorPenetration, -1.0f, instigator, part, projectile) |> pawn.TakeDamage |> ignore
+                        let damageResult =
+                            pawn.TakeDamage(DamageInfo(configuration.injuryDamageDef, damagePerPart, armorPenetration, -1.0f, instigator, part, projectile))
+
+                        damageResult.AssociateWithLog(battleLogEntry)
 
                         index <- index + 1
 
