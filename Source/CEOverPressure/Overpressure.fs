@@ -71,10 +71,12 @@ module internal Overpressure =
         if loggingEnabled.Value then
             Log.Message message
 
-    let private stun (configuration: OverpressureSettingsDef) (pawn: Pawn) peakKPa (instigator: Thing) =
+    let private stunTicks (configuration: OverpressureSettingsDef) peakKPa =
+        Mathf.RoundToInt(Mathf.Clamp(peakKPa, configuration.minimumStunTicks, configuration.maximumStunTicks))
+
+    let private stun (pawn: Pawn) ticks (instigator: Thing) =
         if not pawn.Dead && not (isNull pawn.stances) && not (isNull pawn.stances.stunner) then
-            let stunTicks = Mathf.RoundToInt(Mathf.Clamp(peakKPa, configuration.minimumStunTicks, configuration.maximumStunTicks))
-            pawn.stances.stunner.StunFor(stunTicks, instigator)
+            pawn.stances.stunner.StunFor(ticks, instigator)
 
     let private blastWeightMap =
         lazy
@@ -109,6 +111,18 @@ module internal Overpressure =
         | :? CombatExtended.ProjectileCE as proj when not (isNull proj.launcher) -> proj.launcher
         | _ -> instigator
 
+    let private suppress (configuration: OverpressureSettingsDef) (pawn: Pawn) (origin: IntVec3) (initiator: Thing) ticks =
+        let sourceFaction = if isNull initiator then null else initiator.Faction
+        let suppressable = pawn.TryGetComp<CompSuppressable>()
+
+        if
+            configuration.suppressionPerStunTick > 0.0f
+            && not (isNull suppressable)
+            && not (obj.ReferenceEquals(pawn.Faction, sourceFaction))
+            && not (suppressable.IgnoreSuppresion(origin))
+        then
+            suppressable.AddSuppression(float32 ticks * configuration.suppressionPerStunTick, origin)
+
     let private associateCombatLog
         (battleLogEntry: BattleLogEntry_ExplosionImpact)
         (damageResult: DamageWorker.DamageResult)
@@ -127,16 +141,24 @@ module internal Overpressure =
 
     /// Applies overpressure injuries to a pawn: stuns at moderate pressure,
     /// damages randomly-selected internal body parts at high pressure.
-    let private applyInjuries (configuration: OverpressureSettingsDef) (pawn: Pawn) peakKPa armorPenetration (instigator: Thing) (projectile: ThingDef) =
+    let private applyInjuries
+        (configuration: OverpressureSettingsDef)
+        (pawn: Pawn)
+        peakKPa
+        armorPenetration
+        (origin: IntVec3)
+        (instigator: Thing)
+        (projectile: ThingDef)
+        =
         if peakKPa >= configuration.stunThresholdKPa then
             let initiator = resolveInitiator instigator
+            let ticks = stunTicks configuration peakKPa
+            stun pawn ticks initiator
+            suppress configuration pawn origin initiator ticks
 
             if peakKPa < configuration.injuryThresholdKPa then
                 Log.Message(sprintf "[CE-OverPressure] stunned %O at %.1f kPa" pawn peakKPa)
-                stun configuration pawn peakKPa initiator
             else
-                stun configuration pawn peakKPa initiator
-
                 let weightedParts = SimplePool<List<BodyPartRecord>>.Get()
 
                 try
@@ -220,7 +242,7 @@ module internal Overpressure =
 
             let scaledAP = armorPenetration * Mathf.Clamp01(peakKPa / configuration.armorPenetrationReferencePressureKPa)
 
-            applyInjuries configuration pawn (peakKPa * pressureMultiplier) scaledAP instigator projectile
+            applyInjuries configuration pawn (peakKPa * pressureMultiplier) scaledAP center instigator projectile
 
     /// Main entry point for blast overpressure effects.
     /// Traverses the map region graph from the explosion center, collects pawns,

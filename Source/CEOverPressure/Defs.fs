@@ -127,6 +127,9 @@ type OverpressureSettingsDef() =
     val mutable maximumStunTicks: float32
 
     [<Microsoft.FSharp.Core.DefaultValue>]
+    val mutable suppressionPerStunTick: float32
+
+    [<Microsoft.FSharp.Core.DefaultValue>]
     val mutable damagePressureOffsetKPa: float32
 
     [<Microsoft.FSharp.Core.DefaultValue>]
