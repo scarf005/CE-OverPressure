@@ -6,7 +6,7 @@
   <CEOP_Barotrauma.labelTendedWell>붕대를 감음</CEOP_Barotrauma.labelTendedWell>
   <CEOP_Barotrauma.labelTendedWellInner>봉합함</CEOP_Barotrauma.labelTendedWellInner>
   <CEOP_Barotrauma.labelSolidTendedWell>접합됨</CEOP_Barotrauma.labelSolidTendedWell>
-  <CEOP_Barotrauma.permanentLabel>만성 압력손상</CEOP_Barotrauma.permanentLabel>
+  <CEOP_Barotrauma.comps.HediffComp_GetsPermanent.permanentLabel>만성 압력손상</CEOP_Barotrauma.comps.HediffComp_GetsPermanent.permanentLabel>
   <CEOP_Barotrauma.destroyedLabel>파열됨</CEOP_Barotrauma.destroyedLabel>
 
   <CEOP_BarotraumaSkin.label>압력손상</CEOP_BarotraumaSkin.label>
