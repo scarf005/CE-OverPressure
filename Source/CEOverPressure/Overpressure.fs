@@ -84,6 +84,27 @@ module internal Overpressure =
 
         result
 
+    let private resolveInitiator (instigator: Thing) =
+        match instigator with
+        | :? CombatExtended.ProjectileCE as proj when not (isNull proj.launcher) -> proj.launcher
+        | _ -> instigator
+
+    let private associateCombatLog
+        (battleLogEntry: BattleLogEntry_ExplosionImpact)
+        (damageResult: DamageWorker.DamageResult)
+        (pawn: Pawn)
+        (part: BodyPartRecord)
+        =
+        damageResult.AssociateWithLog(battleLogEntry)
+
+        if pawn.health.hediffSet.PartIsMissing(part) then
+            for hediff in pawn.health.hediffSet.hediffs do
+                match hediff with
+                | :? Hediff_MissingPart as mp when mp.Part = part && isNull mp.combatLogEntry ->
+                    mp.combatLogEntry <- WeakReference<LogEntry>(battleLogEntry)
+                    mp.combatLogText <- battleLogEntry.ToGameStringFromPOV(null)
+                | _ -> ()
+
     /// Applies overpressure injuries to a pawn: stuns at moderate pressure,
     /// damages randomly-selected internal body parts at high pressure.
     let private applyInjuries (configuration: OverpressureSettingsDef) (pawn: Pawn) peakKPa armorPenetration (instigator: Thing) (projectile: ThingDef) =
@@ -92,6 +113,8 @@ module internal Overpressure =
                 Log.Message(sprintf "[CE-OverPressure] stunned %O at %.1f kPa" pawn peakKPa)
                 stun configuration pawn peakKPa instigator
             else
+                stun configuration pawn peakKPa instigator
+
                 let weightedParts = SimplePool<List<BodyPartRecord>>.Get()
 
                 try
@@ -125,7 +148,9 @@ module internal Overpressure =
                             armorPenetration
                     )
 
-                    let battleLogEntry = BattleLogEntry_ExplosionImpact(instigator, pawn, projectile, projectile, configuration.injuryDamageDef)
+                    let initiator = resolveInitiator instigator
+
+                    let battleLogEntry = BattleLogEntry_ExplosionImpact(initiator, pawn, projectile, projectile, configuration.injuryDamageDef)
 
                     Find.BattleLog.Add(battleLogEntry)
 
@@ -140,11 +165,9 @@ module internal Overpressure =
                         let damageResult =
                             pawn.TakeDamage(DamageInfo(configuration.injuryDamageDef, damagePerPart, armorPenetration, -1.0f, instigator, part, projectile))
 
-                        damageResult.AssociateWithLog(battleLogEntry)
+                        associateCombatLog battleLogEntry damageResult pawn part
 
                         index <- index + 1
-
-                    stun configuration pawn peakKPa instigator
                 finally
                     weightedParts.Clear()
                     SimplePool<List<BodyPartRecord>>.Return weightedParts
