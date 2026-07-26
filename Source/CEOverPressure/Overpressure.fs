@@ -306,27 +306,29 @@ module internal Overpressure =
 
                                     for index = pawns.Count - 1 downto 0 do
                                         match pawns[index] with
-                                        | :? Pawn as pawn when processedPawns.Add pawn ->
-                                            applyToPawn
-                                                configuration
-                                                parameters
-                                                center
-                                                map
-                                                scanRadius
-                                                yieldKg
-                                                height
-                                                pressureMultiplier
-                                                blastRoom
-                                                enclosedMultiplier
-                                                instigator
-                                                armorPenetration
-                                                pawn
-                                                projectile
+                                        | :? Pawn as pawn -> processedPawns.Add pawn |> ignore
                                         | _ -> ()
 
                                     false),
                                 maximumRegions
                             )
+
+                            for pawn in processedPawns do
+                                applyToPawn
+                                    configuration
+                                    parameters
+                                    center
+                                    map
+                                    scanRadius
+                                    yieldKg
+                                    height
+                                    pressureMultiplier
+                                    blastRoom
+                                    enclosedMultiplier
+                                    instigator
+                                    armorPenetration
+                                    pawn
+                                    projectile
                         finally
                             processedPawns.Clear()
                             SimplePool<HashSet<Pawn>>.Return processedPawns
