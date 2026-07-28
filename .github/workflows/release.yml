@@ -1,0 +1,66 @@
+name: Build & Release
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+env:
+  RIMWORLD_VERSION: '1.6'
+  MOD_PACKAGE_ID: 'scarf.CombatExtended.OverPressure'
+  SOLUTION_FILE: Source/CEOverPressure/CEOverPressure.fsproj
+  ASSEMBLY_DIR: 1.6/Assemblies
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: download Combat Extended
+        run: |
+          gh release download -R CombatExtended-Continued/CombatExtended -p '*.zip' -O ce.zip
+          unzip -q ce.zip -d ce
+          echo "COMBAT_EXTENDED_DIR=$(realpath ce)" >> "$GITHUB_ENV"
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - run: dotnet build '${{ env.SOLUTION_FILE }}' -c Release
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.MOD_PACKAGE_ID }}-${{ github.ref_name }}
+          path: ${{ env.ASSEMBLY_DIR }}/*.dll
+
+  package:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: ${{ env.MOD_PACKAGE_ID }}-${{ github.ref_name }}
+          path: ${{ env.ASSEMBLY_DIR }}
+
+      - name: create mod archive
+        run: |
+          dist="dist/$MOD_PACKAGE_ID"
+          mkdir -p "$dist"
+          cp -r About LoadFolders.xml "$dist"/
+          for dir in Defs Languages Patches; do
+            [ -d "$dir" ] && cp -r "$dir" "$dist"/
+          done
+          mkdir -p "$dist/$RIMWORLD_VERSION/Assemblies"
+          cp "$ASSEMBLY_DIR"/*.dll "$dist/$RIMWORLD_VERSION/Assemblies/"
+          cd dist && zip -r "../$MOD_PACKAGE_ID-${{ github.ref_name }}.zip" "$MOD_PACKAGE_ID"
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ env.MOD_PACKAGE_ID }}-${{ github.ref_name }}.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
