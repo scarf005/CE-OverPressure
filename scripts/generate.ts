@@ -36,7 +36,9 @@ const tntGrams: Record<string, number> = {
 }
 
 const root = resolve(dirname(fromFileUrl(import.meta.url)), "..")
-const cePath = Deno.args[0] ? resolve(Deno.args[0]) : resolve(root, "../CombatExtended")
+const cePath = Deno.args[0]
+  ? resolve(Deno.args[0])
+  : resolve(root, "../CombatExtended")
 const escapeXml = (value: string) =>
   value.replaceAll("&", "&amp;").replaceAll('"', "&quot;").replaceAll(
     "<",
@@ -74,7 +76,10 @@ const caliber = (name: string) => {
 
 const definitions = async () =>
   (await Array.fromAsync(
-    walk(join(cePath, "Defs", "Ammo"), { includeDirs: false, match: [/\.xml$/] }),
+    walk(join(cePath, "Defs", "Ammo"), {
+      includeDirs: false,
+      match: [/\.xml$/],
+    }),
     ({ path }) => Deno.readTextFile(path),
   )).flatMap((xml) => blocks(xml, "ThingDef"))
 
@@ -93,7 +98,8 @@ const secondaryBombDamage = (block: string) =>
   )
 const ceDamage = (block: string) => {
   const projectile = block.match(/<projectile[\s\S]*?<\/projectile>/)?.[0] ?? ""
-  const value = readTag(projectile, "damageAmountBase") ?? readTag(block, "damageAmountBase")
+  const value = readTag(projectile, "damageAmountBase") ??
+    readTag(block, "damageAmountBase")
   return value ? Number(value) : undefined
 }
 
@@ -251,7 +257,9 @@ await Deno.writeTextFile(
       left.caliberMm - right.caliberMm || left.kind.localeCompare(right.kind) ||
       left.defName.localeCompare(right.defName)
     ).map((ammo) =>
-      `| ${ammo.defName} | ${ammo.kind} | ${ammo.damage ?? "—"} | — | ${ammo.caliberMm} | ${ammo.radius} |`
+      `| ${ammo.defName} | ${ammo.kind} | ${
+        ammo.damage ?? "—"
+      } | — | ${ammo.caliberMm} | ${ammo.radius} |`
     ).join("\n")
   }\n`,
 )
