@@ -3,6 +3,10 @@ import { dirname, fromFileUrl, join, resolve } from "jsr:@std/path@^1.1.2"
 import * as vega from "vega"
 import { compile } from "vega-lite"
 import { calculateRadius, type RegressionFact } from "./calculate_radius.ts"
+import {
+  type AmmunitionDefinition,
+  parseAmmunitionDefinitions,
+} from "./ce_ammo.ts"
 
 type Ammo = {
   defName: string
@@ -45,12 +49,6 @@ const escapeXml = (value: string) =>
     "<",
     "&lt;",
   )
-const readTag = (xml: string, tag: string) =>
-  xml.match(new RegExp(`<${tag}>([^<]+)</${tag}>`))?.[1]?.trim()
-const blocks = (xml: string, tag: string) =>
-  [...xml.matchAll(new RegExp(`<${tag}[^>]*>([\\s\\S]*?)</${tag}>`, "g"))].map((
-    match,
-  ) => match[0])
 const kind = (name: string, label: string) => {
   const text = `${name} ${label}`.toUpperCase()
   if (/(HE_TFUZED|HE_HFUZED|TIME-FUZED|AIRBURST)/.test(text)) return "HE-TF"
@@ -83,62 +81,41 @@ const definitions = async () =>
       match: [/\.xml$/],
     }),
     ({ path }) => Deno.readTextFile(path),
-  )).flatMap((xml) => blocks(xml, "ThingDef"))
+  )).flatMap(parseAmmunitionDefinitions)
 
-const radius = (block: string) =>
-  Number(
-    readTag(
-      block.match(/<projectile[\s\S]*?<\/projectile>/)?.[0] ?? "",
-      "explosionRadius",
-    ) ?? block.match(/<explosiveRadius>([\d.]+)<\/explosiveRadius>/)?.[1],
-  )
-const secondaryBombDamage = (block: string) =>
-  Number(
-    block.match(
-      /<secondaryDamage>[\s\S]*?<def>Bomb_Secondary<\/def>[\s\S]*?<amount>(\d+)<\/amount>/,
-    )?.[1],
-  )
-const ceDamage = (block: string) => {
-  const projectile = block.match(/<projectile[\s\S]*?<\/projectile>/)?.[0] ?? ""
-  const value = readTag(projectile, "damageAmountBase") ??
-    readTag(block, "damageAmountBase")
-  return value ? Number(value) : undefined
-}
-
-const existingAmmo = (definitions: string[]) =>
-  definitions.flatMap((block) => {
-    const defName = readTag(block, "defName") ?? ""
-    const label = readTag(block, "label") ?? defName
-    const caliberMm = caliber(defName)
-    const explosiveRadius = radius(block)
-    const ammoKind = kind(defName, label)
+const existingAmmo = (definitions: AmmunitionDefinition[]) =>
+  definitions.flatMap((definition) => {
+    const caliberMm = caliber(definition.defName)
+    const explosiveRadius = definition.explosionRadius
+    const ammoKind = kind(definition.defName, definition.label)
     if (!caliberMm || caliberMm <= 20 || !explosiveRadius || !ammoKind) {
       return []
     }
     return [{
-      defName,
-      label,
+      defName: definition.defName,
+      label: definition.label,
       caliberMm,
       kind: ammoKind,
       radius: explosiveRadius,
-      damage: ceDamage(block),
+      damage: definition.ceDamage,
       source: "Existing CE" as const,
     }]
   })
 
-const autocannonTargets = (definitions: string[]) =>
-  definitions.flatMap((block) => {
-    const defName = readTag(block, "defName") ?? ""
-    const explosiveDamage = secondaryBombDamage(block)
-    const caliberMm = caliber(defName)
-    if (!caliberMm || !explosiveDamage || !(defName in tntGrams)) return []
+const autocannonTargets = (definitions: AmmunitionDefinition[]) =>
+  definitions.flatMap((definition) => {
+    const explosiveDamage = definition.bombSecondaryDamage
+    const caliberMm = caliber(definition.defName)
+    if (!caliberMm || !explosiveDamage || !(definition.defName in tntGrams)) {
+      return []
+    }
     return [{
-      defName,
-      label: readTag(block, "label") ?? defName,
+      defName: definition.defName,
+      label: definition.label,
       caliberMm,
       kind: "HE",
       damage: explosiveDamage,
-      tntGrams: tntGrams[defName],
+      tntGrams: tntGrams[definition.defName],
     }]
   })
 
