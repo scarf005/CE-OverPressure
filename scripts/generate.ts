@@ -35,9 +35,10 @@ const tntGrams: Record<string, number> = {
   Bullet_40x311mmR_HE: 90,
 }
 
-const root = resolve(dirname(fromFileUrl(import.meta.url)), "..")
+const scriptDirectory = dirname(fromFileUrl(import.meta.url))
+const root = resolve(scriptDirectory, "..")
 const cePath = Deno.args[0]
-  ? resolve(Deno.args[0])
+  ? resolve(scriptDirectory, Deno.args[0])
   : resolve(root, "../CombatExtended")
 const escapeXml = (value: string) =>
   value.replaceAll("&", "&amp;").replaceAll('"', "&quot;").replaceAll(
@@ -78,6 +79,7 @@ const definitions = async () =>
   (await Array.fromAsync(
     walk(join(cePath, "Defs", "Ammo"), {
       includeDirs: false,
+      includeSymlinks: false,
       match: [/\.xml$/],
     }),
     ({ path }) => Deno.readTextFile(path),
