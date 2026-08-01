@@ -2,6 +2,7 @@ import { walk } from "jsr:@std/fs@^1.0.19/walk"
 import { dirname, fromFileUrl, join, resolve } from "jsr:@std/path@^1.1.2"
 import * as vega from "vega"
 import { compile } from "vega-lite"
+import { autocannonPatch } from "./autocannon_patch.ts"
 import { calculateRadius, type RegressionFact } from "./calculate_radius.ts"
 import {
   type AmmunitionDefinition,
@@ -44,11 +45,6 @@ const root = resolve(scriptDirectory, "..")
 const cePath = Deno.args[0]
   ? resolve(scriptDirectory, Deno.args[0])
   : resolve(root, "../CombatExtended")
-const escapeXml = (value: string) =>
-  value.replaceAll("&", "&amp;").replaceAll('"', "&quot;").replaceAll(
-    "<",
-    "&lt;",
-  )
 const kind = (name: string, label: string) => {
   const text = `${name} ${label}`.toUpperCase()
   if (/(HE_TFUZED|HE_HFUZED|TIME-FUZED|AIRBURST)/.test(text)) return "HE-TF"
@@ -118,19 +114,6 @@ const autocannonTargets = (definitions: AmmunitionDefinition[]) =>
       tntGrams: tntGrams[definition.defName],
     }]
   })
-
-const patch = (targets: Ammo[]) =>
-  `<?xml version="1.0" encoding="utf-8"?>
-<Patch><Operation Class="PatchOperationFindMod"><mods><li>CETeam.CombatExtended</li></mods><match Class="PatchOperationSequence"><operations>
-${
-    targets.map((ammo) =>
-      `  <li Class="PatchOperationAdd"><xpath>Defs/ThingDef[defName="${
-        escapeXml(ammo.defName)
-      }"]</xpath><value><comps><li Class="CombatExtended.CompProperties_ExplosiveCE"><damageAmountBase>${ammo.damage}</damageAmountBase><explosiveDamageType>Bomb</explosiveDamageType><explosiveRadius>${ammo.radius}</explosiveRadius><applyDamageToExplosionCellsNeighbors>true</applyDamageToExplosionCellsNeighbors></li></comps></value></li>`
-    ).join("\n")
-  }
-</operations></match></Operation></Patch>
-`
 
 const graph = async (existing: Ammo[], patched: Ammo[]) => {
   const values = [...existing, ...patched].map((ammo) => ({
@@ -223,11 +206,12 @@ const targets = autocannonTargets(definitions_).map((target) => {
 if (!targets.length) throw new Error("no autocannon AP-HE targets found")
 await Deno.writeTextFile(
   join(root, "Patches", "AutocannonExplosions.xml"),
-  patch(targets),
+  autocannonPatch(targets),
 )
+await Deno.mkdir(join(root, "docs"), { recursive: true })
 await Deno.writeTextFile(
-  join(root, "README.md"),
-  `# CE Realistic Autocannon Explosions\n\n![CE ammunition explosion-radius comparison](graph.webp)\n\n## Patched autocannon ammunition\n\n| Projectile ID | CE damage | IRL TNT (g) | Radius (cells) |\n| --- | ---: | ---: | ---: |\n${
+  join(root, "docs", "AutocannonExplosions.md"),
+  `# Autocannon explosion data\n\n![CE ammunition explosion-radius comparison](../graph.webp)\n\n## Patched autocannon ammunition\n\n| Projectile ID | CE damage | IRL TNT (g) | Radius (cells) |\n| --- | ---: | ---: | ---: |\n${
     targets.map((ammo) =>
       `| ${ammo.defName} | ${ammo.damage} | ${ammo.tntGrams} | ${ammo.radius} |`
     ).join("\n")

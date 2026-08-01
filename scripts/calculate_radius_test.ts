@@ -1,6 +1,23 @@
-import { assertEquals, assertThrows } from "jsr:@std/assert"
+import {
+  assertEquals,
+  assertStringIncludes,
+  assertThrows,
+} from "jsr:@std/assert"
+import { autocannonPatch } from "./autocannon_patch.ts"
 import { calculateRadius, fitLinearRegression } from "./calculate_radius.ts"
 import { parseAmmunitionDefinitions } from "./ce_ammo.ts"
+
+Deno.test("marks generated autocannon explosions with the setting gate extension", () => {
+  const patch = autocannonPatch([
+    { defName: "Bullet_Test_APHE", damage: 42, radius: 1 },
+  ])
+
+  assertStringIncludes(
+    patch,
+    '<li Class="CEOverPressure.AutocannonExplosionExtension" />',
+  )
+  assertStringIncludes(patch, "<damageAmountBase>42</damageAmountBase>")
+})
 
 Deno.test("rounds and bounds a smaller shell below larger reference shells", () => {
   assertEquals(

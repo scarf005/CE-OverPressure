@@ -6,7 +6,6 @@
     </mods>
     <match Class="PatchOperationSequence">
       <operations>
-
         <!-- 30x64mm Fuel Cell thermobaric -->
         <li Class="PatchOperationAddModExtension">
           <xpath>/Defs/ThingDef[defName="Bullet_30x64mmFuel_Thermobaric"]</xpath>
@@ -136,7 +135,6 @@
             </li>
           </value>
         </li>
-
       </operations>
     </match>
   </Operation>

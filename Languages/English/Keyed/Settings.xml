@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+  <CE_Tweaks_SettingsCategory>Combat Extended Tweaks</CE_Tweaks_SettingsCategory>
+  <CE_Tweaks_EnableOverpressure_Label>Enable overpressure</CE_Tweaks_EnableOverpressure_Label>
+  <CE_Tweaks_EnableOverpressure_Tooltip>Apply overpressure effects from Combat Extended explosions.</CE_Tweaks_EnableOverpressure_Tooltip>
+  <CE_Tweaks_EnableAutocannonExplosions_Label>Enable autocannon explosions</CE_Tweaks_EnableAutocannonExplosions_Label>
+  <CE_Tweaks_EnableAutocannonExplosions_Tooltip>Enable blast effects added to selected autocannon AP-HE projectiles.</CE_Tweaks_EnableAutocannonExplosions_Tooltip>
+  <CE_Tweaks_EnableLogging_Label>Enable debug logging</CE_Tweaks_EnableLogging_Label>
+  <CE_Tweaks_EnableLogging_Tooltip>Log overpressure events to the console.</CE_Tweaks_EnableLogging_Tooltip>
+</LanguageData>

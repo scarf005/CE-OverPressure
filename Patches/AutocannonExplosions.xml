@@ -17,6 +17,9 @@
                 <applyDamageToExplosionCellsNeighbors>true</applyDamageToExplosionCellsNeighbors>
               </li>
             </comps>
+            <modExtensions>
+              <li Class="CEOverPressure.AutocannonExplosionExtension" />
+            </modExtensions>
           </value>
         </li>
         <li Class="PatchOperationAdd">
@@ -30,6 +33,9 @@
                 <applyDamageToExplosionCellsNeighbors>true</applyDamageToExplosionCellsNeighbors>
               </li>
             </comps>
+            <modExtensions>
+              <li Class="CEOverPressure.AutocannonExplosionExtension" />
+            </modExtensions>
           </value>
         </li>
         <li Class="PatchOperationAdd">
@@ -43,6 +49,9 @@
                 <applyDamageToExplosionCellsNeighbors>true</applyDamageToExplosionCellsNeighbors>
               </li>
             </comps>
+            <modExtensions>
+              <li Class="CEOverPressure.AutocannonExplosionExtension" />
+            </modExtensions>
           </value>
         </li>
         <li Class="PatchOperationAdd">
@@ -56,6 +65,9 @@
                 <applyDamageToExplosionCellsNeighbors>true</applyDamageToExplosionCellsNeighbors>
               </li>
             </comps>
+            <modExtensions>
+              <li Class="CEOverPressure.AutocannonExplosionExtension" />
+            </modExtensions>
           </value>
         </li>
         <li Class="PatchOperationAdd">
@@ -69,6 +81,9 @@
                 <applyDamageToExplosionCellsNeighbors>true</applyDamageToExplosionCellsNeighbors>
               </li>
             </comps>
+            <modExtensions>
+              <li Class="CEOverPressure.AutocannonExplosionExtension" />
+            </modExtensions>
           </value>
         </li>
         <li Class="PatchOperationAdd">
@@ -82,6 +97,9 @@
                 <applyDamageToExplosionCellsNeighbors>true</applyDamageToExplosionCellsNeighbors>
               </li>
             </comps>
+            <modExtensions>
+              <li Class="CEOverPressure.AutocannonExplosionExtension" />
+            </modExtensions>
           </value>
         </li>
         <li Class="PatchOperationAdd">
@@ -95,6 +113,9 @@
                 <applyDamageToExplosionCellsNeighbors>true</applyDamageToExplosionCellsNeighbors>
               </li>
             </comps>
+            <modExtensions>
+              <li Class="CEOverPressure.AutocannonExplosionExtension" />
+            </modExtensions>
           </value>
         </li>
         <li Class="PatchOperationAdd">
@@ -108,6 +129,9 @@
                 <applyDamageToExplosionCellsNeighbors>true</applyDamageToExplosionCellsNeighbors>
               </li>
             </comps>
+            <modExtensions>
+              <li Class="CEOverPressure.AutocannonExplosionExtension" />
+            </modExtensions>
           </value>
         </li>
         <li Class="PatchOperationAdd">
@@ -121,6 +145,9 @@
                 <applyDamageToExplosionCellsNeighbors>true</applyDamageToExplosionCellsNeighbors>
               </li>
             </comps>
+            <modExtensions>
+              <li Class="CEOverPressure.AutocannonExplosionExtension" />
+            </modExtensions>
           </value>
         </li>
         <li Class="PatchOperationAdd">
@@ -134,6 +161,9 @@
                 <applyDamageToExplosionCellsNeighbors>true</applyDamageToExplosionCellsNeighbors>
               </li>
             </comps>
+            <modExtensions>
+              <li Class="CEOverPressure.AutocannonExplosionExtension" />
+            </modExtensions>
           </value>
         </li>
         <li Class="PatchOperationAdd">
@@ -147,6 +177,9 @@
                 <applyDamageToExplosionCellsNeighbors>true</applyDamageToExplosionCellsNeighbors>
               </li>
             </comps>
+            <modExtensions>
+              <li Class="CEOverPressure.AutocannonExplosionExtension" />
+            </modExtensions>
           </value>
         </li>
         <li Class="PatchOperationAdd">
@@ -160,6 +193,9 @@
                 <applyDamageToExplosionCellsNeighbors>true</applyDamageToExplosionCellsNeighbors>
               </li>
             </comps>
+            <modExtensions>
+              <li Class="CEOverPressure.AutocannonExplosionExtension" />
+            </modExtensions>
           </value>
         </li>
         <li Class="PatchOperationAdd">
@@ -173,6 +209,9 @@
                 <applyDamageToExplosionCellsNeighbors>true</applyDamageToExplosionCellsNeighbors>
               </li>
             </comps>
+            <modExtensions>
+              <li Class="CEOverPressure.AutocannonExplosionExtension" />
+            </modExtensions>
           </value>
         </li>
         <li Class="PatchOperationAdd">
@@ -186,6 +225,9 @@
                 <applyDamageToExplosionCellsNeighbors>true</applyDamageToExplosionCellsNeighbors>
               </li>
             </comps>
+            <modExtensions>
+              <li Class="CEOverPressure.AutocannonExplosionExtension" />
+            </modExtensions>
           </value>
         </li>
         <li Class="PatchOperationAdd">
@@ -199,6 +241,9 @@
                 <applyDamageToExplosionCellsNeighbors>true</applyDamageToExplosionCellsNeighbors>
               </li>
             </comps>
+            <modExtensions>
+              <li Class="CEOverPressure.AutocannonExplosionExtension" />
+            </modExtensions>
           </value>
         </li>
         <li Class="PatchOperationAdd">
@@ -212,6 +257,9 @@
                 <applyDamageToExplosionCellsNeighbors>true</applyDamageToExplosionCellsNeighbors>
               </li>
             </comps>
+            <modExtensions>
+              <li Class="CEOverPressure.AutocannonExplosionExtension" />
+            </modExtensions>
           </value>
         </li>
         <li Class="PatchOperationAdd">
@@ -225,6 +273,9 @@
                 <applyDamageToExplosionCellsNeighbors>true</applyDamageToExplosionCellsNeighbors>
               </li>
             </comps>
+            <modExtensions>
+              <li Class="CEOverPressure.AutocannonExplosionExtension" />
+            </modExtensions>
           </value>
         </li>
       </operations>

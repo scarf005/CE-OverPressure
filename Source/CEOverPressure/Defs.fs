@@ -23,6 +23,11 @@ type OverpressureExtension() as this =
         this.tntEquivalentKg <- -1.0f
         this.pressureMultiplier <- 1.0f
 
+/// Marks projectile defs whose CE explosive component is added by this mod.
+[<AllowNullLiteral>]
+type AutocannonExplosionExtension() =
+    inherit DefModExtension()
+
 /// Defines a pressure threshold and the maximum number of internal body parts
 /// to damage when peak overpressure exceeds that threshold.
 [<AllowNullLiteral>]

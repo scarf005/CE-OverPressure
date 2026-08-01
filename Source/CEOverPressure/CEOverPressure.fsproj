@@ -2,7 +2,7 @@
   <PropertyGroup>
     <TargetFramework>net472</TargetFramework>
     <OutputType>Library</OutputType>
-    <AssemblyName>CEOverPressure</AssemblyName>
+    <AssemblyName>CETweaks</AssemblyName>
     <RootNamespace>CEOverPressure</RootNamespace>
     <DebugSymbols>false</DebugSymbols>
     <DebugType>none</DebugType>

@@ -7,13 +7,26 @@ open Verse
 type CEOverPressureSettings() =
     inherit ModSettings()
 
+    let mutable enableOverpressure = false
+    let mutable enableAutocannonExplosions = false
     let mutable enableLogging = false
+
+    member this.EnableOverpressure
+        with get () = enableOverpressure
+        and set v = enableOverpressure <- v
+
+    member this.EnableAutocannonExplosions
+        with get () = enableAutocannonExplosions
+        and set v = enableAutocannonExplosions <- v
 
     member this.EnableLogging
         with get () = enableLogging
         and set v = enableLogging <- v
 
-    override this.ExposeData() = Scribe_Values.Look<bool>(&enableLogging, "enableLogging", false, false)
+    override this.ExposeData() =
+        Scribe_Values.Look<bool>(&enableOverpressure, "enableOverpressure", false, false)
+        Scribe_Values.Look<bool>(&enableAutocannonExplosions, "enableAutocannonExplosions", false, false)
+        Scribe_Values.Look<bool>(&enableLogging, "enableLogging", false, false)
 
 
 type CEOverPressureMod(contents: ModContentPack) as this =
@@ -21,18 +34,34 @@ type CEOverPressureMod(contents: ModContentPack) as this =
 
     do LongEventHandler.ExecuteWhenFinished(fun () -> this.GetSettings<CEOverPressureSettings>() |> ignore)
 
-    override this.SettingsCategory() = "CE-OverPressure"
+    override this.SettingsCategory() = "CE_Tweaks_SettingsCategory".Translate().ToString()
 
     override this.DoSettingsWindowContents(canvas: Rect) =
         let listing = Listing_Standard()
         listing.Begin(canvas)
 
         let settings = this.GetSettings<CEOverPressureSettings>()
+        let mutable overpressure = settings.EnableOverpressure
+        let mutable autocannonExplosions = settings.EnableAutocannonExplosions
         let mutable logging = settings.EnableLogging
 
-        listing.CheckboxLabeled("Enable debug logging", &logging, "Log overpressure events to the console")
+        listing.CheckboxLabeled(
+            "CE_Tweaks_EnableOverpressure_Label".Translate().ToString(),
+            &overpressure,
+            "CE_Tweaks_EnableOverpressure_Tooltip".Translate().ToString()
+        )
 
-        if logging <> settings.EnableLogging then
+        listing.CheckboxLabeled(
+            "CE_Tweaks_EnableAutocannonExplosions_Label".Translate().ToString(),
+            &autocannonExplosions,
+            "CE_Tweaks_EnableAutocannonExplosions_Tooltip".Translate().ToString()
+        )
+
+        listing.CheckboxLabeled("CE_Tweaks_EnableLogging_Label".Translate().ToString(), &logging, "CE_Tweaks_EnableLogging_Tooltip".Translate().ToString())
+
+        if overpressure <> settings.EnableOverpressure || autocannonExplosions <> settings.EnableAutocannonExplosions || logging <> settings.EnableLogging then
+            settings.EnableOverpressure <- overpressure
+            settings.EnableAutocannonExplosions <- autocannonExplosions
             settings.EnableLogging <- logging
             settings.Write()
 

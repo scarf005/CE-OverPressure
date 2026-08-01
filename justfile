@@ -17,7 +17,7 @@ fmt:
 
 # Build the assembly and regenerate autocannon runtime patches
 generate:
-    deno check scripts/calculate_radius.ts scripts/ce_ammo.ts scripts/generate.ts
+    deno check scripts/autocannon_patch.ts scripts/calculate_radius.ts scripts/ce_ammo.ts scripts/generate.ts
     deno test --allow-read scripts
     deno run --allow-read=.,"${COMBAT_EXTENDED_DIR}" --allow-write=. --allow-run=magick scripts/generate.ts "${COMBAT_EXTENDED_DIR}"
     deno fmt Patches/AutocannonExplosions.xml docs/AutocannonExplosions.md
@@ -37,7 +37,9 @@ install: build
     destination="$mods_directory/{{mod_directory}}"
     staging="$(mktemp -d)"
     trap 'rm -rf "$staging"' EXIT
-    rsync --archive About Defs Languages Patches LoadFolders.xml 1.6 "$staging/"
+    rsync --archive About Defs Languages Patches LoadFolders.xml "$staging/"
+    mkdir -p "$staging/1.6/Assemblies"
+    rsync --archive 1.6/Assemblies/CETweaks.dll "$staging/1.6/Assemblies/"
     mkdir -p "$destination"
     rsync --archive --delete "$staging/" "$destination/"
     printf 'Installed {{mod_directory}} to %s\n' "$destination"

@@ -65,10 +65,12 @@ module internal Overpressure =
             let sizeFactor = Mathf.Sqrt(Mathf.Clamp01(configuration.enclosedReferenceRoomCellCount / cellCount))
             1.0f + (configuration.maximumEnclosedReflectionMultiplier - 1.0f) * roofFraction * sizeFactor
 
-    let private loggingEnabled = lazy (LoadedModManager.GetMod<CEOverPressureMod>().GetSettings<CEOverPressureSettings>().EnableLogging)
+    let private modSettings () = LoadedModManager.GetMod<CEOverPressureMod>().GetSettings<CEOverPressureSettings>()
+
+    let private overpressureEnabled () = (modSettings ()).EnableOverpressure
 
     let private log message =
-        if loggingEnabled.Value then
+        if (modSettings ()).EnableLogging then
             Log.Message message
 
     let private stunTicks (configuration: OverpressureSettingsDef) peakKPa =
@@ -157,7 +159,7 @@ module internal Overpressure =
             suppress configuration pawn origin initiator ticks
 
             if peakKPa < configuration.injuryThresholdKPa then
-                Log.Message(sprintf "[CE-OverPressure] stunned %O at %.1f kPa" pawn peakKPa)
+                log (sprintf "[CE-Tweaks] stunned %O at %.1f kPa" pawn peakKPa)
             else
                 let weightedParts = SimplePool<List<BodyPartRecord>>.Get()
 
@@ -183,7 +185,7 @@ module internal Overpressure =
 
                     log (
                         sprintf
-                            "[CE-OverPressure] injured %O at %.1f kPa, %d/%d parts, %.1f dmg/part, ap=%.2f"
+                            "[CE-Tweaks] injured %O at %.1f kPa, %d/%d parts, %.1f dmg/part, ap=%.2f"
                             pawn
                             peakKPa
                             count
@@ -258,7 +260,7 @@ module internal Overpressure =
         (projectile: ThingDef)
         (height: float32)
         =
-        if not (isNull map) && center.InBounds map && not (isNull damageDef) then
+        if overpressureEnabled () && not (isNull map) && center.InBounds map && not (isNull damageDef) then
             let configuration = settings.Value
             let extension = extensionFor projectile
 
@@ -282,7 +284,7 @@ module internal Overpressure =
 
                         log (
                             sprintf
-                                "[CE-OverPressure] %O caused %.3fkg TNT blast at %O, pressureMult=%.2f, enclosedMult=%.2f, scanRadius=%.1f"
+                                "[CE-Tweaks] %O caused %.3fkg TNT blast at %O, pressureMult=%.2f, enclosedMult=%.2f, scanRadius=%.1f"
                                 instigator
                                 yieldKg
                                 center
@@ -350,6 +352,14 @@ module internal ExplosionPatch =
                 explosion.height
         | _ -> ()
 
+[<HarmonyPatch(typeof<CompExplosiveCE>, "Explode")>]
+module internal AutocannonExplosionPatch =
+    let Prefix (__instance: CompExplosiveCE) =
+        let parent = __instance.parent
+        let settings = LoadedModManager.GetMod<CEOverPressureMod>().GetSettings<CEOverPressureSettings>()
+
+        settings.EnableAutocannonExplosions || isNull parent || isNull parent.def || isNull (parent.def.GetModExtension<AutocannonExplosionExtension>())
+
 [<StaticConstructorOnStartup>]
 type CEOverPressureBootstrap() =
-    static do Harmony("scarf.CombatExtended.OverPressure").PatchAll()
+    static do Harmony("scarf.CombatExtended.tweaks").PatchAll()

@@ -2,12 +2,12 @@ name: Build & Release
 
 on:
   push:
-    tags: ['v*']
+    tags: ["v*"]
   workflow_dispatch:
 
 env:
-  RIMWORLD_VERSION: '1.6'
-  MOD_PACKAGE_ID: 'scarf.CombatExtended.OverPressure'
+  RIMWORLD_VERSION: "1.6"
+  MOD_PACKAGE_ID: "scarf.CombatExtended.tweaks"
   SOLUTION_FILE: Source/CEOverPressure/CEOverPressure.fsproj
   ASSEMBLY_DIR: 1.6/Assemblies
 
@@ -27,7 +27,7 @@ jobs:
 
       - uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8.0.x'
+          dotnet-version: "8.0.x"
 
       - run: dotnet build '${{ env.SOLUTION_FILE }}' -c Release
 
