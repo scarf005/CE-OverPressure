@@ -107,12 +107,17 @@ const radius = (block: string) =>
       "explosionRadius",
     ) ?? block.match(/<explosiveRadius>([\d.]+)<\/explosiveRadius>/)?.[1],
   )
-const damage = (block: string) =>
+const secondaryBombDamage = (block: string) =>
   Number(
     block.match(
       /<secondaryDamage>[\s\S]*?<def>Bomb_Secondary<\/def>[\s\S]*?<amount>(\d+)<\/amount>/,
     )?.[1],
   )
+const ceDamage = (block: string) => {
+  const projectile = block.match(/<projectile[\s\S]*?<\/projectile>/)?.[0] ?? ""
+  const value = readTag(projectile, "damageAmountBase") ?? readTag(block, "damageAmountBase")
+  return value ? Number(value) : undefined
+}
 
 const existingAmmo = (definitions: string[]) =>
   definitions.flatMap((block) => {
@@ -130,6 +135,7 @@ const existingAmmo = (definitions: string[]) =>
       caliberMm,
       kind: ammoKind,
       radius: explosiveRadius,
+      damage: ceDamage(block),
       source: "Existing CE" as const,
     }]
   })
@@ -137,7 +143,7 @@ const existingAmmo = (definitions: string[]) =>
 const autocannonTargets = (definitions: string[]) =>
   definitions.flatMap((block) => {
     const defName = readTag(block, "defName") ?? ""
-    const explosiveDamage = damage(block)
+    const explosiveDamage = secondaryBombDamage(block)
     const caliberMm = caliber(defName)
     if (!caliberMm || !explosiveDamage || !(defName in tntGrams)) return []
     return [{
@@ -262,12 +268,12 @@ await Deno.writeTextFile(
     targets.map((ammo) =>
       `| ${ammo.defName} | ${ammo.damage} | ${ammo.tntGrams} | ${ammo.radius} |`
     ).join("\n")
-  }\n\n## Existing CE reference ammunition\n\n| Projectile ID | Ammo kind | Caliber (mm) | Radius (cells) |\n| --- | --- | ---: | ---: |\n${
+  }\n\n## Existing CE reference ammunition\n\n| Projectile ID | Ammo kind | CE damage | IRL TNT (g) | Caliber (mm) | Radius (cells) |\n| --- | --- | ---: | ---: | ---: | ---: |\n${
     existing.sort((left, right) =>
       left.caliberMm - right.caliberMm || left.kind.localeCompare(right.kind) ||
       left.defName.localeCompare(right.defName)
     ).map((ammo) =>
-      `| ${ammo.defName} | ${ammo.kind} | ${ammo.caliberMm} | ${ammo.radius} |`
+      `| ${ammo.defName} | ${ammo.kind} | ${ammo.damage ?? "—"} | — | ${ammo.caliberMm} | ${ammo.radius} |`
     ).join("\n")
   }\n`,
 )
