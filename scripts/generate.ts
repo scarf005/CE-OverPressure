@@ -1,11 +1,36 @@
-import { ammunitionFacts, calculateRadius } from "./calculate_radius.ts"
+import * as vega from "vega"
+import { compile } from "vega-lite"
+import { calculateRadius, type RegressionFact } from "./calculate_radius.ts"
 
-type Projectile = {
+type Ammo = {
   defName: string
   label: string
-  damageAmountBase: number
-  explosiveRadius: number
-  tntGrams: number
+  caliberMm: number
+  kind: string
+  radius: number
+  damage?: number
+  tntGrams?: number
+  source: "Existing CE" | "Patched"
+}
+
+const tntGrams: Record<string, number> = {
+  Bullet_20x82mmMauser_HE: 6,
+  Bullet_20x99mmRShVAK_HE: 4,
+  Bullet_20x102mmNATO_HE: 10.7,
+  Bullet_20x110mmHispano_HE: 6,
+  Bullet_20x128mmOerlikon_HE: 10,
+  Bullet_20x138mmB_HE: 11,
+  Bullet_20x139mm_HE: 10,
+  Bullet_23x115mm_HE: 15,
+  Bullet_23x152mmB_APHE: 18,
+  Bullet_25x137mmNATO_HE: 22,
+  Bullet_27x145mmMauser_HE: 20,
+  Bullet_30x113mmB_HE: 24,
+  Bullet_30x165mm_HE: 49,
+  Bullet_30x170mm_HE: 38,
+  Bullet_30x173mmNATO_HE: 44,
+  Bullet_35x228mmNATO_HE: 112,
+  Bullet_40x311mmR_HE: 90,
 }
 
 const root = new URL("..", import.meta.url)
@@ -13,32 +38,58 @@ const cePath = Deno.args[0]
   ? new URL(`${Deno.args[0]}/`, import.meta.url)
   : new URL("../CombatExtended/", root)
 const escapeXml = (value: string) =>
-  value.replaceAll("&", "&amp;").replaceAll('"', "&quot;")
+  value.replaceAll("&", "&amp;").replaceAll('"', "&quot;").replaceAll(
+    "<",
+    "&lt;",
+  )
 const readTag = (xml: string, tag: string) =>
   xml.match(new RegExp(`<${tag}>([^<]+)</${tag}>`))?.[1]?.trim()
 const blocks = (xml: string, tag: string) =>
   [...xml.matchAll(new RegExp(`<${tag}[^>]*>([\\s\\S]*?)</${tag}>`, "g"))].map((
     match,
   ) => match[0])
+const kind = (name: string, label: string) => {
+  const text = `${name} ${label}`.toUpperCase()
+  if (/(HE_TFUZED|HE_HFUZED|TIME-FUZED|AIRBURST)/.test(text)) return "HE-TF"
+  if (text.includes("HEDP")) return "HEDP"
+  if (text.includes("HEAT")) return "HEAT"
+  if (text.includes("INCENDIARY") || text.includes("AP-I")) return "I"
+  if (text.includes("EMP")) return "EMP"
+  if (text.includes("SMOKE")) return "Smoke"
+  if (/(^|_)HE($|_)/.test(name.toUpperCase()) || text.includes("AP-HE")) {
+    return "HE"
+  }
+  return undefined
+}
+const caliber = (name: string) => {
+  const match = name.match(/(\d+(?:\.\d+)?)(x|mm|cm)/i)
+  if (!match) return undefined
+  const value = Number(match[1])
+  return match[2].toLowerCase() === "cm"
+    ? value * 10
+    : value > 200
+    ? value / 10
+    : value
+}
 
 const files = async (directory: URL): Promise<URL[]> => {
-  const entries: URL[] = []
+  const result: URL[] = []
   try {
     for await (const entry of Deno.readDir(directory)) {
       const path = new URL(entry.name, directory)
       if (entry.isDirectory && !entry.isSymlink) {
-        entries.push(...await files(new URL(`${entry.name}/`, directory)))
+        result.push(...await files(new URL(`${entry.name}/`, directory)))
       }
-      if (entry.isFile && entry.name.endsWith(".xml")) entries.push(path)
+      if (entry.isFile && entry.name.endsWith(".xml")) result.push(path)
     }
   } catch (error) {
     if (!(error instanceof Deno.errors.NotFound)) throw error
   }
-  return entries
+  return result
 }
 
-const targets = async () => {
-  const xml = (await Promise.all(
+const definitions = async () =>
+  (await Promise.all(
     (await files(new URL("Defs/Ammo/", cePath))).map(async (path) => {
       try {
         return await Deno.readTextFile(path)
@@ -47,133 +98,181 @@ const targets = async () => {
         throw error
       }
     }),
-  )).filter(Boolean)
-  const autocannonAmmo = new Set(
-    xml.flatMap((file) =>
-      blocks(file, "CombatExtended.AmmoSetDef").flatMap((block) => {
-        if (
-          readTag(block, "defName") !== "AmmoSet_Autocannon" &&
-          readTag(block, "similarTo") !== "AmmoSet_Autocannon"
-        ) return []
-        return [...block.matchAll(/>\s*(Bullet_[^<\s]+)\s*</g)].map((match) =>
-          match[1]
-        )
-      })
-    ),
+  )).flatMap((xml) => blocks(xml, "ThingDef"))
+
+const radius = (block: string) =>
+  Number(
+    readTag(
+      block.match(/<projectile[\s\S]*?<\/projectile>/)?.[0] ?? "",
+      "explosionRadius",
+    ) ?? block.match(/<explosiveRadius>([\d.]+)<\/explosiveRadius>/)?.[1],
   )
-  return xml.flatMap((file) => blocks(file, "ThingDef")).flatMap((block) => {
-    const defName = readTag(block, "defName")
-    const secondary = block.match(
-      /<secondaryDamage>[\s\S]*?<li>[\s\S]*?<def>Bomb_Secondary<\/def>[\s\S]*?<amount>(\d+)<\/amount>[\s\S]*?<\/li>[\s\S]*?<\/secondaryDamage>/,
-    )
-    if (
-      !defName || !autocannonAmmo.has(defName) || !secondary ||
-      !(defName in ammunitionFacts)
-    ) return []
-    const { explosiveRadius, fillerGrams } = calculateRadius(defName)
+const damage = (block: string) =>
+  Number(
+    block.match(
+      /<secondaryDamage>[\s\S]*?<def>Bomb_Secondary<\/def>[\s\S]*?<amount>(\d+)<\/amount>/,
+    )?.[1],
+  )
+
+const existingAmmo = (definitions: string[]) =>
+  definitions.flatMap((block) => {
+    const defName = readTag(block, "defName") ?? ""
+    const label = readTag(block, "label") ?? defName
+    const caliberMm = caliber(defName)
+    const explosiveRadius = radius(block)
+    const ammoKind = kind(defName, label)
+    if (!caliberMm || caliberMm <= 20 || !explosiveRadius || !ammoKind) {
+      return []
+    }
+    return [{
+      defName,
+      label,
+      caliberMm,
+      kind: ammoKind,
+      radius: explosiveRadius,
+      source: "Existing CE" as const,
+    }]
+  })
+
+const autocannonTargets = (definitions: string[]) =>
+  definitions.flatMap((block) => {
+    const defName = readTag(block, "defName") ?? ""
+    const explosiveDamage = damage(block)
+    const caliberMm = caliber(defName)
+    if (!caliberMm || !explosiveDamage || !(defName in tntGrams)) return []
     return [{
       defName,
       label: readTag(block, "label") ?? defName,
-      damageAmountBase: Number(secondary[1]),
-      explosiveRadius,
-      tntGrams: fillerGrams,
+      caliberMm,
+      kind: "HE",
+      damage: explosiveDamage,
+      tntGrams: tntGrams[defName],
     }]
-  }).sort((left, right) => left.defName.localeCompare(right.defName))
-}
+  })
 
-const patch = (projectiles: Projectile[]) =>
+const patch = (targets: Ammo[]) =>
   `<?xml version="1.0" encoding="utf-8"?>
-<Patch>
-  <Operation Class="PatchOperationFindMod">
-    <mods><li>CETeam.CombatExtended</li></mods>
-    <match Class="PatchOperationSequence">
-      <operations>
+<Patch><Operation Class="PatchOperationFindMod"><mods><li>CETeam.CombatExtended</li></mods><match Class="PatchOperationSequence"><operations>
 ${
-    projectiles.map(({ defName, damageAmountBase, explosiveRadius }) =>
-      `        <li Class="PatchOperationAdd">
-          <xpath>Defs/ThingDef[defName="${escapeXml(defName)}"]</xpath>
-          <value><comps><li Class="CombatExtended.CompProperties_ExplosiveCE"><damageAmountBase>${damageAmountBase}</damageAmountBase><explosiveDamageType>Bomb</explosiveDamageType><explosiveRadius>${explosiveRadius}</explosiveRadius><applyDamageToExplosionCellsNeighbors>true</applyDamageToExplosionCellsNeighbors></li></comps></value>
-        </li>`
+    targets.map((ammo) =>
+      `  <li Class="PatchOperationAdd"><xpath>Defs/ThingDef[defName="${
+        escapeXml(ammo.defName)
+      }"]</xpath><value><comps><li Class="CombatExtended.CompProperties_ExplosiveCE"><damageAmountBase>${ammo.damage}</damageAmountBase><explosiveDamageType>Bomb</explosiveDamageType><explosiveRadius>${ammo.radius}</explosiveRadius><applyDamageToExplosionCellsNeighbors>true</applyDamageToExplosionCellsNeighbors></li></comps></value></li>`
     ).join("\n")
   }
-      </operations>
-    </match>
-  </Operation>
-</Patch>
+</operations></match></Operation></Patch>
 `
 
-const graph = (projectiles: Projectile[]) => {
-  const width = 1600
-  const height = 960
-  const chart = { left: 140, right: 260, top: 100, bottom: 110 }
-  const maximumTnt = 120
-  const maximumRadius = 6
-  const x = (value: number) =>
-    chart.left + value / maximumTnt * (width - chart.left - chart.right)
-  const y = (value: number) =>
-    height - chart.bottom -
-    value / maximumRadius * (height - chart.top - chart.bottom)
-  const ordered = [...projectiles].sort((left, right) =>
-    left.tntGrams - right.tntGrams
-  )
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}"><rect width="100%" height="100%" fill="#ffffff"/><g font-family="sans-serif"><g stroke="#486581" stroke-width="2"><path d="M${chart.left} ${
-    height - chart.bottom
-  }H${width - chart.right}M${chart.left} ${
-    height - chart.bottom
-  }V${chart.top}"/></g><g fill="#102a43"><text x="${
-    width / 2
-  }" y="920" text-anchor="middle" font-size="24">IRL TNT equivalent (g)</text><text x="38" y="${
-    height / 2
-  }" transform="rotate(-90 38 ${
-    height / 2
-  })" text-anchor="middle" font-size="24">RimWorld explosion radius (cells)</text><text x="${chart.left}" y="55" font-size="30">Patched CE autocannon ammunition</text></g>${
-    ordered.map(({ label, tntGrams, explosiveRadius }, index) => {
-      const pointX = x(tntGrams)
-      const pointY = y(explosiveRadius)
-      const offset = (index % 2 ? 1 : -1) * (18 + index % 4 * 12)
-      return `<path d="M${pointX} ${pointY}L${pointX + 14} ${
-        pointY + offset
-      }" stroke="#268bd2"/><circle cx="${pointX}" cy="${pointY}" r="7" fill="#268bd2"/><text x="${
-        pointX + 18
-      }" y="${pointY + offset + 5}" fill="#102a43" font-size="15">${
-        escapeXml(label)
-      }</text>`
-    }).join("")
-  }</g></svg>`
-}
-
-const readme = (projectiles: Projectile[]) =>
-  `# CE Realistic Autocannon Explosions
-
-![Patched autocannon explosion radii](graph.webp)
-
-One RimWorld cell is one metre of fragment-danger radius.
-
-| Projectile ID | CE damage | IRL TNT (g) | Radius (cells) |
-| --- | ---: | ---: | ---: |
-${
-    projectiles.map((
-      { defName, damageAmountBase, tntGrams, explosiveRadius },
-    ) =>
-      `| ${defName} | ${damageAmountBase} | ${tntGrams} | ${explosiveRadius} |`
-    ).join("\n")
+const graph = async (existing: Ammo[], patched: Ammo[]) => {
+  const values = [...existing, ...patched].map((ammo) => ({
+    ...ammo,
+    name: ammo.label,
+    label: [
+        "Bullet_90mmCannonShell_HE",
+        "Bullet_105mmHowitzerShell_HE",
+        "Bullet_120mmCannonShell_HE",
+      ].includes(ammo.defName)
+      ? ammo.label
+      : "",
+  }))
+  const spec = {
+    $schema: "https://vega.github.io/schema/vega-lite/v6.json",
+    width: 1000,
+    height: 620,
+    background: "white",
+    title: "CE ammunition explosion-radius comparison",
+    layer: [{
+      data: { values: existing },
+      transform: [{
+        regression: "radius",
+        on: "caliberMm",
+        groupby: ["kind"],
+        method: "linear",
+      }],
+      mark: { type: "line", opacity: 0.55, strokeWidth: 2 },
+      encoding: {
+        x: { field: "caliberMm", type: "quantitative", title: "Caliber (mm)" },
+        y: {
+          field: "radius",
+          type: "quantitative",
+          title: "RimWorld explosion radius (cells)",
+        },
+        color: { field: "kind", type: "nominal", title: "Ammo kind" },
+      },
+    }, {
+      data: { values },
+      mark: { type: "point", filled: true, size: 80 },
+      encoding: {
+        x: { field: "caliberMm", type: "quantitative", title: "Caliber (mm)" },
+        y: {
+          field: "radius",
+          type: "quantitative",
+          title: "RimWorld explosion radius (cells)",
+        },
+        color: { field: "kind", type: "nominal", title: "Ammo kind" },
+        shape: { field: "source", type: "nominal", title: "Source" },
+        tooltip: [
+          { field: "name", type: "nominal", title: "Ammo" },
+          { field: "kind", type: "nominal" },
+          { field: "caliberMm", type: "quantitative", title: "Caliber" },
+          { field: "radius", type: "quantitative", title: "Radius" },
+        ],
+      },
+    }, {
+      data: { values: values.filter(({ label }) => label) },
+      mark: { type: "text", align: "left", dx: 8, dy: -8, fontSize: 11 },
+      encoding: {
+        x: { field: "caliberMm", type: "quantitative" },
+        y: { field: "radius", type: "quantitative" },
+        text: { field: "label", type: "nominal" },
+        color: { value: "#102a43" },
+      },
+    }],
   }
-
-Run: deno run --allow-read --allow-write --allow-run=magick scripts/generate.ts [CE defs path].
-`
-
-const projectiles = await targets()
-if (projectiles.length === 0) {
-  throw new Error(`no AP-HE autocannon projectiles found in ${cePath.pathname}`)
+  return await new vega.View(vega.parse(compile(spec as never).spec), {
+    renderer: "none",
+  }).toSVG()
 }
-await Deno.mkdir(new URL("Patches/", root), { recursive: true })
+
+const definitions_ = await definitions()
+const existing = existingAmmo(definitions_)
+const targets = autocannonTargets(definitions_).map((target) => {
+  const facts: RegressionFact[] = existing.filter((ammo) =>
+    ammo.kind === target.kind
+  ).map(({ caliberMm, radius }) => ({ caliberMm, radius }))
+  if (facts.length < 2) {
+    throw new Error(
+      `not enough CE ${target.kind} reference rounds for ${target.defName}`,
+    )
+  }
+  return {
+    ...target,
+    radius: calculateRadius(target.caliberMm, facts),
+    source: "Patched" as const,
+  }
+})
+if (!targets.length) throw new Error("no autocannon AP-HE targets found")
 await Deno.writeTextFile(
   new URL("Patches/AutocannonExplosions.xml", root),
-  patch(projectiles),
+  patch(targets),
 )
-await Deno.writeTextFile(new URL("README.md", root), readme(projectiles))
+await Deno.writeTextFile(
+  new URL("README.md", root),
+  `# CE Realistic Autocannon Explosions\n\n![CE ammunition explosion-radius comparison](graph.webp)\n\n## Patched autocannon ammunition\n\n| Projectile ID | CE damage | IRL TNT (g) | Radius (cells) |\n| --- | ---: | ---: | ---: |\n${
+    targets.map((ammo) =>
+      `| ${ammo.defName} | ${ammo.damage} | ${ammo.tntGrams} | ${ammo.radius} |`
+    ).join("\n")
+  }\n\n## Existing CE reference ammunition\n\n| Projectile ID | Ammo kind | Caliber (mm) | Radius (cells) |\n| --- | --- | ---: | ---: |\n${
+    existing.sort((left, right) =>
+      left.caliberMm - right.caliberMm || left.kind.localeCompare(right.kind) ||
+      left.defName.localeCompare(right.defName)
+    ).map((ammo) =>
+      `| ${ammo.defName} | ${ammo.kind} | ${ammo.caliberMm} | ${ammo.radius} |`
+    ).join("\n")
+  }\n`,
+)
 const svgPath = new URL("graph.svg", root)
-await Deno.writeTextFile(svgPath, graph(projectiles))
+await Deno.writeTextFile(svgPath, await graph(existing, targets))
 const result = await new Deno.Command("magick", {
   args: [svgPath.pathname, new URL("graph.webp", root).pathname],
   clearEnv: true,

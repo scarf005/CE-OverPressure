@@ -1,16 +1,16 @@
 import { assertEquals, assertThrows } from "jsr:@std/assert"
 import { calculateRadius, fitLinearRegression } from "./calculate_radius.ts"
 
-Deno.test("calculates the 30x165mm HE radius from its filler-mass fact", () => {
-  assertEquals(calculateRadius("Bullet_30x165mm_HE").explosiveRadius, 3.21)
-})
-
-Deno.test("rejects an unknown projectile without a filler-mass fact", () => {
-  assertThrows(() => calculateRadius("Bullet_unknown_HE"))
-})
-
-Deno.test("rejects a regression with one observation", () => {
-  assertThrows(() =>
-    fitLinearRegression([{ fillerGrams: 1, fragmentDangerRadiusM: 1 }])
+Deno.test("rounds and bounds a smaller shell below larger reference shells", () => {
+  assertEquals(
+    calculateRadius(40, [{ caliberMm: 57, radius: 2 }, {
+      caliberMm: 90,
+      radius: 2.5,
+    }]),
+    1.5,
   )
+})
+
+Deno.test("rejects a regression with one reference round", () => {
+  assertThrows(() => fitLinearRegression([{ caliberMm: 30, radius: 1 }]))
 })
