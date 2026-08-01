@@ -4,9 +4,13 @@ export RIMWORLD_MODS_CONFIG := env("RIMWORLD_MODS_CONFIG", "/home/scarf/.config/
 mod_directory := "CE-Realistic-Autocannon-Explosions"
 
 fmt:
-    @:
+    deno fmt
 
 build:
+    deno check scripts/calculate_radius.ts scripts/generate.ts
+    deno test --allow-read scripts
+    deno run --allow-read=.,../CombatExtended --allow-write=. --allow-run=magick scripts/generate.ts
+    deno fmt README.md Patches/AutocannonExplosions.xml
     deno run --allow-read ~/.config/pi/agent/skills/rimworld/scripts/validate-mod.ts
 
 install: build

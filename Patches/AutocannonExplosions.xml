@@ -13,7 +13,7 @@
               <li Class="CombatExtended.CompProperties_ExplosiveCE">
                 <damageAmountBase>31</damageAmountBase>
                 <explosiveDamageType>Bomb</explosiveDamageType>
-                <explosiveRadius>0.5</explosiveRadius>
+                <explosiveRadius>1.64</explosiveRadius>
                 <applyDamageToExplosionCellsNeighbors>true</applyDamageToExplosionCellsNeighbors>
               </li>
             </comps>
@@ -26,7 +26,7 @@
               <li Class="CombatExtended.CompProperties_ExplosiveCE">
                 <damageAmountBase>35</damageAmountBase>
                 <explosiveDamageType>Bomb</explosiveDamageType>
-                <explosiveRadius>0.5</explosiveRadius>
+                <explosiveRadius>1.45</explosiveRadius>
                 <applyDamageToExplosionCellsNeighbors>true</applyDamageToExplosionCellsNeighbors>
               </li>
             </comps>
@@ -39,7 +39,7 @@
               <li Class="CombatExtended.CompProperties_ExplosiveCE">
                 <damageAmountBase>35</damageAmountBase>
                 <explosiveDamageType>Bomb</explosiveDamageType>
-                <explosiveRadius>0.5</explosiveRadius>
+                <explosiveRadius>1.61</explosiveRadius>
                 <applyDamageToExplosionCellsNeighbors>true</applyDamageToExplosionCellsNeighbors>
               </li>
             </comps>
@@ -52,7 +52,7 @@
               <li Class="CombatExtended.CompProperties_ExplosiveCE">
                 <damageAmountBase>35</damageAmountBase>
                 <explosiveDamageType>Bomb</explosiveDamageType>
-                <explosiveRadius>0.5</explosiveRadius>
+                <explosiveRadius>1.66</explosiveRadius>
                 <applyDamageToExplosionCellsNeighbors>true</applyDamageToExplosionCellsNeighbors>
               </li>
             </comps>
@@ -65,7 +65,7 @@
               <li Class="CombatExtended.CompProperties_ExplosiveCE">
                 <damageAmountBase>35</damageAmountBase>
                 <explosiveDamageType>Bomb</explosiveDamageType>
-                <explosiveRadius>0.5</explosiveRadius>
+                <explosiveRadius>1.61</explosiveRadius>
                 <applyDamageToExplosionCellsNeighbors>true</applyDamageToExplosionCellsNeighbors>
               </li>
             </comps>
@@ -78,7 +78,7 @@
               <li Class="CombatExtended.CompProperties_ExplosiveCE">
                 <damageAmountBase>33</damageAmountBase>
                 <explosiveDamageType>Bomb</explosiveDamageType>
-                <explosiveRadius>0.5</explosiveRadius>
+                <explosiveRadius>1.45</explosiveRadius>
                 <applyDamageToExplosionCellsNeighbors>true</applyDamageToExplosionCellsNeighbors>
               </li>
             </comps>
@@ -91,7 +91,7 @@
               <li Class="CombatExtended.CompProperties_ExplosiveCE">
                 <damageAmountBase>31</damageAmountBase>
                 <explosiveDamageType>Bomb</explosiveDamageType>
-                <explosiveRadius>0.5</explosiveRadius>
+                <explosiveRadius>1.37</explosiveRadius>
                 <applyDamageToExplosionCellsNeighbors>true</applyDamageToExplosionCellsNeighbors>
               </li>
             </comps>
@@ -104,7 +104,7 @@
               <li Class="CombatExtended.CompProperties_ExplosiveCE">
                 <damageAmountBase>44</damageAmountBase>
                 <explosiveDamageType>Bomb</explosiveDamageType>
-                <explosiveRadius>0.5</explosiveRadius>
+                <explosiveRadius>1.82</explosiveRadius>
                 <applyDamageToExplosionCellsNeighbors>true</applyDamageToExplosionCellsNeighbors>
               </li>
             </comps>
@@ -117,7 +117,7 @@
               <li Class="CombatExtended.CompProperties_ExplosiveCE">
                 <damageAmountBase>46</damageAmountBase>
                 <explosiveDamageType>Bomb</explosiveDamageType>
-                <explosiveRadius>0.5</explosiveRadius>
+                <explosiveRadius>1.94</explosiveRadius>
                 <applyDamageToExplosionCellsNeighbors>true</applyDamageToExplosionCellsNeighbors>
               </li>
             </comps>
@@ -130,7 +130,7 @@
               <li Class="CombatExtended.CompProperties_ExplosiveCE">
                 <damageAmountBase>45</damageAmountBase>
                 <explosiveDamageType>Bomb</explosiveDamageType>
-                <explosiveRadius>0.5</explosiveRadius>
+                <explosiveRadius>2.1</explosiveRadius>
                 <applyDamageToExplosionCellsNeighbors>true</applyDamageToExplosionCellsNeighbors>
               </li>
             </comps>
@@ -143,7 +143,7 @@
               <li Class="CombatExtended.CompProperties_ExplosiveCE">
                 <damageAmountBase>56</damageAmountBase>
                 <explosiveDamageType>Bomb</explosiveDamageType>
-                <explosiveRadius>0.5</explosiveRadius>
+                <explosiveRadius>2.02</explosiveRadius>
                 <applyDamageToExplosionCellsNeighbors>true</applyDamageToExplosionCellsNeighbors>
               </li>
             </comps>
@@ -156,7 +156,7 @@
               <li Class="CombatExtended.CompProperties_ExplosiveCE">
                 <damageAmountBase>58</damageAmountBase>
                 <explosiveDamageType>Bomb</explosiveDamageType>
-                <explosiveRadius>0.5</explosiveRadius>
+                <explosiveRadius>2.19</explosiveRadius>
                 <applyDamageToExplosionCellsNeighbors>true</applyDamageToExplosionCellsNeighbors>
               </li>
             </comps>
@@ -169,7 +169,7 @@
               <li Class="CombatExtended.CompProperties_ExplosiveCE">
                 <damageAmountBase>71</damageAmountBase>
                 <explosiveDamageType>Bomb</explosiveDamageType>
-                <explosiveRadius>0.5</explosiveRadius>
+                <explosiveRadius>3.21</explosiveRadius>
                 <applyDamageToExplosionCellsNeighbors>true</applyDamageToExplosionCellsNeighbors>
               </li>
             </comps>
@@ -182,7 +182,7 @@
               <li Class="CombatExtended.CompProperties_ExplosiveCE">
                 <damageAmountBase>68</damageAmountBase>
                 <explosiveDamageType>Bomb</explosiveDamageType>
-                <explosiveRadius>0.5</explosiveRadius>
+                <explosiveRadius>2.76</explosiveRadius>
                 <applyDamageToExplosionCellsNeighbors>true</applyDamageToExplosionCellsNeighbors>
               </li>
             </comps>
@@ -195,7 +195,7 @@
               <li Class="CombatExtended.CompProperties_ExplosiveCE">
                 <damageAmountBase>69</damageAmountBase>
                 <explosiveDamageType>Bomb</explosiveDamageType>
-                <explosiveRadius>0.5</explosiveRadius>
+                <explosiveRadius>3</explosiveRadius>
                 <applyDamageToExplosionCellsNeighbors>true</applyDamageToExplosionCellsNeighbors>
               </li>
             </comps>
@@ -208,7 +208,7 @@
               <li Class="CombatExtended.CompProperties_ExplosiveCE">
                 <damageAmountBase>87</damageAmountBase>
                 <explosiveDamageType>Bomb</explosiveDamageType>
-                <explosiveRadius>1.0</explosiveRadius>
+                <explosiveRadius>5.78</explosiveRadius>
                 <applyDamageToExplosionCellsNeighbors>true</applyDamageToExplosionCellsNeighbors>
               </li>
             </comps>
@@ -221,7 +221,7 @@
               <li Class="CombatExtended.CompProperties_ExplosiveCE">
                 <damageAmountBase>117</damageAmountBase>
                 <explosiveDamageType>Bomb</explosiveDamageType>
-                <explosiveRadius>1.5</explosiveRadius>
+                <explosiveRadius>4.88</explosiveRadius>
                 <applyDamageToExplosionCellsNeighbors>true</applyDamageToExplosionCellsNeighbors>
               </li>
             </comps>

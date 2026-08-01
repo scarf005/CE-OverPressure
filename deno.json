@@ -1,0 +1,4 @@
+{
+  "fmt": { "semiColons": false },
+  "test": { "include": ["scripts"] }
+}
