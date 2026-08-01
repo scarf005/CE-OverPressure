@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Patch>
+  <Operation Class="PatchOperationFindMod">
+    <mods>
+      <li>CETeam.CombatExtended</li>
+    </mods>
+    <match Class="PatchOperationSequence">
+      <operations>
+        <li Class="PatchOperationAdd">
+          <xpath>Defs/ThingDef[defName="Bullet_20x102mmNATO_HE"]</xpath>
+          <value>
+            <comps>
+              <li Class="CombatExtended.CompProperties_ExplosiveCE">
+                <damageAmountBase>31</damageAmountBase>
+                <explosiveDamageType>Bomb</explosiveDamageType>
+                <explosiveRadius>0.5</explosiveRadius>
+                <applyDamageToExplosionCellsNeighbors>true</applyDamageToExplosionCellsNeighbors>
+              </li>
+            </comps>
+          </value>
+        </li>
+        <li Class="PatchOperationAdd">
+          <xpath>Defs/ThingDef[defName="Bullet_20x110mmHispano_HE"]</xpath>
+          <value>
+            <comps>
+              <li Class="CombatExtended.CompProperties_ExplosiveCE">
+                <damageAmountBase>35</damageAmountBase>
+                <explosiveDamageType>Bomb</explosiveDamageType>
+                <explosiveRadius>0.5</explosiveRadius>
+                <applyDamageToExplosionCellsNeighbors>true</applyDamageToExplosionCellsNeighbors>
+              </li>
+            </comps>
+          </value>
+        </li>
+        <li Class="PatchOperationAdd">
+          <xpath>Defs/ThingDef[defName="Bullet_20x128mmOerlikon_HE"]</xpath>
+          <value>
+            <comps>
+              <li Class="CombatExtended.CompProperties_ExplosiveCE">
+                <damageAmountBase>35</damageAmountBase>
+                <explosiveDamageType>Bomb</explosiveDamageType>
+                <explosiveRadius>0.5</explosiveRadius>
+                <applyDamageToExplosionCellsNeighbors>true</applyDamageToExplosionCellsNeighbors>
+              </li>
+            </comps>
+          </value>
+        </li>
+        <li Class="PatchOperationAdd">
+          <xpath>Defs/ThingDef[defName="Bullet_20x138mmB_HE"]</xpath>
+          <value>
+            <comps>
+              <li Class="CombatExtended.CompProperties_ExplosiveCE">
+                <damageAmountBase>35</damageAmountBase>
+                <explosiveDamageType>Bomb</explosiveDamageType>
+                <explosiveRadius>0.5</explosiveRadius>
+                <applyDamageToExplosionCellsNeighbors>true</applyDamageToExplosionCellsNeighbors>
+              </li>
+            </comps>
+          </value>
+        </li>
+        <li Class="PatchOperationAdd">
+          <xpath>Defs/ThingDef[defName="Bullet_20x139mm_HE"]</xpath>
+          <value>
+            <comps>
+              <li Class="CombatExtended.CompProperties_ExplosiveCE">
+                <damageAmountBase>35</damageAmountBase>
+                <explosiveDamageType>Bomb</explosiveDamageType>
+                <explosiveRadius>0.5</explosiveRadius>
+                <applyDamageToExplosionCellsNeighbors>true</applyDamageToExplosionCellsNeighbors>
+              </li>
+            </comps>
+          </value>
+        </li>
+        <li Class="PatchOperationAdd">
+          <xpath>Defs/ThingDef[defName="Bullet_20x82mmMauser_HE"]</xpath>
+          <value>
+            <comps>
+              <li Class="CombatExtended.CompProperties_ExplosiveCE">
+                <damageAmountBase>33</damageAmountBase>
+                <explosiveDamageType>Bomb</explosiveDamageType>
+                <explosiveRadius>0.5</explosiveRadius>
+                <applyDamageToExplosionCellsNeighbors>true</applyDamageToExplosionCellsNeighbors>
+              </li>
+            </comps>
+          </value>
+        </li>
+        <li Class="PatchOperationAdd">
+          <xpath>Defs/ThingDef[defName="Bullet_20x99mmRShVAK_HE"]</xpath>
+          <value>
+            <comps>
+              <li Class="CombatExtended.CompProperties_ExplosiveCE">
+                <damageAmountBase>31</damageAmountBase>
+                <explosiveDamageType>Bomb</explosiveDamageType>
+                <explosiveRadius>0.5</explosiveRadius>
+                <applyDamageToExplosionCellsNeighbors>true</applyDamageToExplosionCellsNeighbors>
+              </li>
+            </comps>
+          </value>
+        </li>
+        <li Class="PatchOperationAdd">
+          <xpath>Defs/ThingDef[defName="Bullet_23x115mm_HE"]</xpath>
+          <value>
+            <comps>
+              <li Class="CombatExtended.CompProperties_ExplosiveCE">
+                <damageAmountBase>44</damageAmountBase>
+                <explosiveDamageType>Bomb</explosiveDamageType>
+                <explosiveRadius>0.5</explosiveRadius>
+                <applyDamageToExplosionCellsNeighbors>true</applyDamageToExplosionCellsNeighbors>
+              </li>
+            </comps>
+          </value>
+        </li>
+        <li Class="PatchOperationAdd">
+          <xpath>Defs/ThingDef[defName="Bullet_23x152mmB_APHE"]</xpath>
+          <value>
+            <comps>
+              <li Class="CombatExtended.CompProperties_ExplosiveCE">
+                <damageAmountBase>46</damageAmountBase>
+                <explosiveDamageType>Bomb</explosiveDamageType>
+                <explosiveRadius>0.5</explosiveRadius>
+                <applyDamageToExplosionCellsNeighbors>true</applyDamageToExplosionCellsNeighbors>
+              </li>
+            </comps>
+          </value>
+        </li>
+        <li Class="PatchOperationAdd">
+          <xpath>Defs/ThingDef[defName="Bullet_25x137mmNATO_HE"]</xpath>
+          <value>
+            <comps>
+              <li Class="CombatExtended.CompProperties_ExplosiveCE">
+                <damageAmountBase>45</damageAmountBase>
+                <explosiveDamageType>Bomb</explosiveDamageType>
+                <explosiveRadius>0.5</explosiveRadius>
+                <applyDamageToExplosionCellsNeighbors>true</applyDamageToExplosionCellsNeighbors>
+              </li>
+            </comps>
+          </value>
+        </li>
+        <li Class="PatchOperationAdd">
+          <xpath>Defs/ThingDef[defName="Bullet_27x145mmMauser_HE"]</xpath>
+          <value>
+            <comps>
+              <li Class="CombatExtended.CompProperties_ExplosiveCE">
+                <damageAmountBase>56</damageAmountBase>
+                <explosiveDamageType>Bomb</explosiveDamageType>
+                <explosiveRadius>0.5</explosiveRadius>
+                <applyDamageToExplosionCellsNeighbors>true</applyDamageToExplosionCellsNeighbors>
+              </li>
+            </comps>
+          </value>
+        </li>
+        <li Class="PatchOperationAdd">
+          <xpath>Defs/ThingDef[defName="Bullet_30x113mmB_HE"]</xpath>
+          <value>
+            <comps>
+              <li Class="CombatExtended.CompProperties_ExplosiveCE">
+                <damageAmountBase>58</damageAmountBase>
+                <explosiveDamageType>Bomb</explosiveDamageType>
+                <explosiveRadius>0.5</explosiveRadius>
+                <applyDamageToExplosionCellsNeighbors>true</applyDamageToExplosionCellsNeighbors>
+              </li>
+            </comps>
+          </value>
+        </li>
+        <li Class="PatchOperationAdd">
+          <xpath>Defs/ThingDef[defName="Bullet_30x165mm_HE"]</xpath>
+          <value>
+            <comps>
+              <li Class="CombatExtended.CompProperties_ExplosiveCE">
+                <damageAmountBase>71</damageAmountBase>
+                <explosiveDamageType>Bomb</explosiveDamageType>
+                <explosiveRadius>0.5</explosiveRadius>
+                <applyDamageToExplosionCellsNeighbors>true</applyDamageToExplosionCellsNeighbors>
+              </li>
+            </comps>
+          </value>
+        </li>
+        <li Class="PatchOperationAdd">
+          <xpath>Defs/ThingDef[defName="Bullet_30x170mm_HE"]</xpath>
+          <value>
+            <comps>
+              <li Class="CombatExtended.CompProperties_ExplosiveCE">
+                <damageAmountBase>68</damageAmountBase>
+                <explosiveDamageType>Bomb</explosiveDamageType>
+                <explosiveRadius>0.5</explosiveRadius>
+                <applyDamageToExplosionCellsNeighbors>true</applyDamageToExplosionCellsNeighbors>
+              </li>
+            </comps>
+          </value>
+        </li>
+        <li Class="PatchOperationAdd">
+          <xpath>Defs/ThingDef[defName="Bullet_30x173mmNATO_HE"]</xpath>
+          <value>
+            <comps>
+              <li Class="CombatExtended.CompProperties_ExplosiveCE">
+                <damageAmountBase>69</damageAmountBase>
+                <explosiveDamageType>Bomb</explosiveDamageType>
+                <explosiveRadius>0.5</explosiveRadius>
+                <applyDamageToExplosionCellsNeighbors>true</applyDamageToExplosionCellsNeighbors>
+              </li>
+            </comps>
+          </value>
+        </li>
+        <li Class="PatchOperationAdd">
+          <xpath>Defs/ThingDef[defName="Bullet_35x228mmNATO_HE"]</xpath>
+          <value>
+            <comps>
+              <li Class="CombatExtended.CompProperties_ExplosiveCE">
+                <damageAmountBase>87</damageAmountBase>
+                <explosiveDamageType>Bomb</explosiveDamageType>
+                <explosiveRadius>1.0</explosiveRadius>
+                <applyDamageToExplosionCellsNeighbors>true</applyDamageToExplosionCellsNeighbors>
+              </li>
+            </comps>
+          </value>
+        </li>
+        <li Class="PatchOperationAdd">
+          <xpath>Defs/ThingDef[defName="Bullet_40x311mmR_HE"]</xpath>
+          <value>
+            <comps>
+              <li Class="CombatExtended.CompProperties_ExplosiveCE">
+                <damageAmountBase>117</damageAmountBase>
+                <explosiveDamageType>Bomb</explosiveDamageType>
+                <explosiveRadius>1.5</explosiveRadius>
+                <applyDamageToExplosionCellsNeighbors>true</applyDamageToExplosionCellsNeighbors>
+              </li>
+            </comps>
+          </value>
+        </li>
+      </operations>
+    </match>
+  </Operation>
+</Patch>

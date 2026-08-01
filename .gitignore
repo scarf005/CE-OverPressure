@@ -1,0 +1,3 @@
+*.dll
+Source/**/bin/
+Source/**/obj/
