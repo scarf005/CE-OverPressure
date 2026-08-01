@@ -1,0 +1,8 @@
+{
+  "fmt": { "semiColons": false },
+  "imports": {
+    "vega": "npm:vega@^6.2.0",
+    "vega-lite": "npm:vega-lite@^6.4.1"
+  },
+  "test": { "include": ["scripts"] }
+}

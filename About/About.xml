@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ModMetaData>
-  <name>Combat Extended OverPressure</name>
+  <name>[scarf] Combat Extended Tweaks</name>
   <author>scarf</author>
-  <packageId>scarf.CombatExtended.OverPressure</packageId>
+  <packageId>scarf.CombatExtended.tweaks</packageId>
   <modVersion>1.0.0</modVersion>
   <supportedVersions>
     <li>1.6</li>
@@ -32,5 +32,5 @@
     <li>latta.fsharp.core</li>
     <li>CETeam.CombatExtended</li>
   </loadAfter>
-  <description>Adds blast overpressure injuries to Combat Extended explosions, including wall shielding, enclosed-space pressure reflection, and internal-organ damage.</description>
+  <description>Optional Combat Extended overpressure injuries and realistic autocannon explosions.</description>
 </ModMetaData>

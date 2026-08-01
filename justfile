@@ -2,22 +2,30 @@ export RIMWORLD_DIR := env("RIMWORLD_DIR", "/media/scarf/@steam/SteamLibrary/ste
 export RIMWORLD_MODS_CONFIG := env("RIMWORLD_MODS_CONFIG", "/home/scarf/.config/unity3d/Ludeon Studios/RimWorld by Ludeon Studios/Config/ModsConfig.xml")
 export COMBAT_EXTENDED_DIR := env("COMBAT_EXTENDED_DIR", "/media/scarf/@steam/SteamLibrary/steamapps/workshop/content/294100/2890901044")
 
-mod_directory := "CE-OverPressure"
+mod_directory := "CE-tweaks"
 
-# Run pressure-model tests
+# Run overpressure and generator tests
 test:
     mise exec dotnet@8.0.422 -- dotnet fsi Tests/PressureModelTests.fsx
+    deno test --allow-read scripts
 
-# Format F# with Fantomas
+# Format F# and Deno sources with their tracked configuration
 fmt:
     mise exec dotnet@8.0.422 -- dotnet tool restore
     mise exec dotnet@8.0.422 -- dotnet tool run fantomas Source/CEOverPressure Tests
+    deno fmt
 
-# Build the mod assembly
-build:
+# Build the assembly and regenerate autocannon runtime patches
+generate:
+    deno check scripts/calculate_radius.ts scripts/ce_ammo.ts scripts/generate.ts
+    deno test --allow-read scripts
+    deno run --allow-read=.,"${COMBAT_EXTENDED_DIR}" --allow-write=. --allow-run=magick scripts/generate.ts "${COMBAT_EXTENDED_DIR}"
+    deno fmt Patches/AutocannonExplosions.xml docs/AutocannonExplosions.md
+
+build: generate
     mise exec dotnet@8.0.422 -- dotnet build Source/CEOverPressure/CEOverPressure.fsproj -c Release
 
-# Build and install the runtime mod locally
+# Build and install only the runtime mod tree locally
 install: build
     #!/bin/sh
     set -eu
@@ -27,14 +35,11 @@ install: build
         exit 1
     fi
     destination="$mods_directory/{{mod_directory}}"
+    staging="$(mktemp -d)"
+    trap 'rm -rf "$staging"' EXIT
+    rsync --archive About Defs Languages Patches LoadFolders.xml 1.6 "$staging/"
     mkdir -p "$destination"
-    rsync --archive --delete --delete-excluded \
-        --exclude '/.*' \
-        --exclude '/Source/' \
-        --exclude '/Tests/' \
-        --exclude '/README*' \
-        --exclude '/justfile' \
-        ./ "$destination/"
+    rsync --archive --delete "$staging/" "$destination/"
     printf 'Installed {{mod_directory}} to %s\n' "$destination"
 
 # Build, install, and enable the mod locally
