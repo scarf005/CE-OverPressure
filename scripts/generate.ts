@@ -2,9 +2,10 @@ import { ammunitionFacts, calculateRadius } from "./calculate_radius.ts"
 
 type Projectile = {
   defName: string
+  label: string
   damageAmountBase: number
   explosiveRadius: number
-  fillerGrams: number
+  tntGrams: number
 }
 
 const root = new URL("..", import.meta.url)
@@ -72,9 +73,10 @@ const targets = async () => {
     const { explosiveRadius, fillerGrams } = calculateRadius(defName)
     return [{
       defName,
+      label: readTag(block, "label") ?? defName,
       damageAmountBase: Number(secondary[1]),
       explosiveRadius,
-      fillerGrams,
+      tntGrams: fillerGrams,
     }]
   }).sort((left, right) => left.defName.localeCompare(right.defName))
 }
@@ -101,25 +103,41 @@ ${
 `
 
 const graph = (projectiles: Projectile[]) => {
-  const width = 1400
-  const labelWidth = 480
-  const chartWidth = 820
-  const rowHeight = 38
-  const height = projectiles.length * rowHeight + 130
-  const maximumRadius = Math.ceil(
-    Math.max(...projectiles.map(({ explosiveRadius }) => explosiveRadius)),
+  const width = 1600
+  const height = 960
+  const chart = { left: 140, right: 260, top: 100, bottom: 110 }
+  const maximumTnt = 120
+  const maximumRadius = 6
+  const x = (value: number) =>
+    chart.left + value / maximumTnt * (width - chart.left - chart.right)
+  const y = (value: number) =>
+    height - chart.bottom -
+    value / maximumRadius * (height - chart.top - chart.bottom)
+  const ordered = [...projectiles].sort((left, right) =>
+    left.tntGrams - right.tntGrams
   )
-  const barWidth = (radius: number) => radius / maximumRadius * chartWidth
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}"><rect width="100%" height="100%" fill="#101418"/><g fill="#d9e2ec" font-family="sans-serif"><text x="40" y="40" font-size="28">Patched CE autocannon ammunition</text><text x="${labelWidth}" y="75" font-size="18">Explosion radius changed from 0 cells to metres/cells</text>${
-    projectiles.map(({ defName, explosiveRadius }, index) => {
-      const y = 100 + index * rowHeight
-      return `<text x="40" y="${
-        y + 20
-      }" font-size="16">${defName}</text><rect x="${labelWidth}" y="${y}" width="${
-        barWidth(explosiveRadius)
-      }" height="24" fill="#63b3ed"/><text x="${
-        labelWidth + barWidth(explosiveRadius) + 12
-      }" y="${y + 19}" font-size="16">0 → ${explosiveRadius}</text>`
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}"><rect width="100%" height="100%" fill="#ffffff"/><g font-family="sans-serif"><g stroke="#486581" stroke-width="2"><path d="M${chart.left} ${
+    height - chart.bottom
+  }H${width - chart.right}M${chart.left} ${
+    height - chart.bottom
+  }V${chart.top}"/></g><g fill="#102a43"><text x="${
+    width / 2
+  }" y="920" text-anchor="middle" font-size="24">IRL TNT equivalent (g)</text><text x="38" y="${
+    height / 2
+  }" transform="rotate(-90 38 ${
+    height / 2
+  })" text-anchor="middle" font-size="24">RimWorld explosion radius (cells)</text><text x="${chart.left}" y="55" font-size="30">Patched CE autocannon ammunition</text></g>${
+    ordered.map(({ label, tntGrams, explosiveRadius }, index) => {
+      const pointX = x(tntGrams)
+      const pointY = y(explosiveRadius)
+      const offset = (index % 2 ? 1 : -1) * (18 + index % 4 * 12)
+      return `<path d="M${pointX} ${pointY}L${pointX + 14} ${
+        pointY + offset
+      }" stroke="#268bd2"/><circle cx="${pointX}" cy="${pointY}" r="7" fill="#268bd2"/><text x="${
+        pointX + 18
+      }" y="${pointY + offset + 5}" fill="#102a43" font-size="15">${
+        escapeXml(label)
+      }</text>`
     }).join("")
   }</g></svg>`
 }
@@ -129,13 +147,15 @@ const readme = (projectiles: Projectile[]) =>
 
 ![Patched autocannon explosion radii](graph.webp)
 
-One RimWorld cell is one metre of fragment-danger radius. The graph shows every patched projectile and its radius change from zero.
+One RimWorld cell is one metre of fragment-danger radius.
 
-| Projectile | HE filler (g) | Radius (cells) |
-| --- | ---: | ---: |
+| Projectile ID | CE damage | IRL TNT (g) | Radius (cells) |
+| --- | ---: | ---: | ---: |
 ${
-    projectiles.map(({ defName, fillerGrams, explosiveRadius }) =>
-      `| ${defName} | ${fillerGrams} | ${explosiveRadius} |`
+    projectiles.map((
+      { defName, damageAmountBase, tntGrams, explosiveRadius },
+    ) =>
+      `| ${defName} | ${damageAmountBase} | ${tntGrams} | ${explosiveRadius} |`
     ).join("\n")
   }
 
