@@ -1,3 +1,5 @@
+import { walk } from "jsr:@std/fs@^1.0.19/walk"
+import { dirname, fromFileUrl, join, resolve } from "jsr:@std/path@^1.1.2"
 import * as vega from "vega"
 import { compile } from "vega-lite"
 import { calculateRadius, type RegressionFact } from "./calculate_radius.ts"
@@ -33,10 +35,8 @@ const tntGrams: Record<string, number> = {
   Bullet_40x311mmR_HE: 90,
 }
 
-const root = new URL("..", import.meta.url)
-const cePath = Deno.args[0]
-  ? new URL(`${Deno.args[0]}/`, import.meta.url)
-  : new URL("../CombatExtended/", root)
+const root = resolve(dirname(fromFileUrl(import.meta.url)), "..")
+const cePath = Deno.args[0] ? resolve(Deno.args[0]) : resolve(root, "../CombatExtended")
 const escapeXml = (value: string) =>
   value.replaceAll("&", "&amp;").replaceAll('"', "&quot;").replaceAll(
     "<",
@@ -72,32 +72,10 @@ const caliber = (name: string) => {
     : value
 }
 
-const files = async (directory: URL): Promise<URL[]> => {
-  const result: URL[] = []
-  try {
-    for await (const entry of Deno.readDir(directory)) {
-      const path = new URL(entry.name, directory)
-      if (entry.isDirectory && !entry.isSymlink) {
-        result.push(...await files(new URL(`${entry.name}/`, directory)))
-      }
-      if (entry.isFile && entry.name.endsWith(".xml")) result.push(path)
-    }
-  } catch (error) {
-    if (!(error instanceof Deno.errors.NotFound)) throw error
-  }
-  return result
-}
-
 const definitions = async () =>
-  (await Promise.all(
-    (await files(new URL("Defs/Ammo/", cePath))).map(async (path) => {
-      try {
-        return await Deno.readTextFile(path)
-      } catch (error) {
-        if (error instanceof Deno.errors.NotFound) return ""
-        throw error
-      }
-    }),
+  (await Array.fromAsync(
+    walk(join(cePath, "Defs", "Ammo"), { includeDirs: false, match: [/\.xml$/] }),
+    ({ path }) => Deno.readTextFile(path),
   )).flatMap((xml) => blocks(xml, "ThingDef"))
 
 const radius = (block: string) =>
@@ -259,11 +237,11 @@ const targets = autocannonTargets(definitions_).map((target) => {
 })
 if (!targets.length) throw new Error("no autocannon AP-HE targets found")
 await Deno.writeTextFile(
-  new URL("Patches/AutocannonExplosions.xml", root),
+  join(root, "Patches", "AutocannonExplosions.xml"),
   patch(targets),
 )
 await Deno.writeTextFile(
-  new URL("README.md", root),
+  join(root, "README.md"),
   `# CE Realistic Autocannon Explosions\n\n![CE ammunition explosion-radius comparison](graph.webp)\n\n## Patched autocannon ammunition\n\n| Projectile ID | CE damage | IRL TNT (g) | Radius (cells) |\n| --- | ---: | ---: | ---: |\n${
     targets.map((ammo) =>
       `| ${ammo.defName} | ${ammo.damage} | ${ammo.tntGrams} | ${ammo.radius} |`
@@ -277,10 +255,10 @@ await Deno.writeTextFile(
     ).join("\n")
   }\n`,
 )
-const svgPath = new URL("graph.svg", root)
+const svgPath = join(root, "graph.svg")
 await Deno.writeTextFile(svgPath, await graph(existing, targets))
 const result = await new Deno.Command("magick", {
-  args: [svgPath.pathname, new URL("graph.webp", root).pathname],
+  args: [svgPath, join(root, "graph.webp")],
   clearEnv: true,
 }).output()
 await Deno.remove(svgPath)
